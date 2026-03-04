@@ -1,0 +1,57 @@
+services:
+  db_autozu:
+    image: mariadb:11
+    container_name: nextcloud-autozu-db
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      - MYSQL_ROOT_PASSWORD=Händler1234
+      - MYSQL_PASSWORD=Händler1234
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    volumes:
+      - "C:/Nextcloud_Autozu/db:/var/lib/mysql"
+    networks:
+      - autozu_net
+
+  app_autozu:
+    image: nextcloud:apache
+    container_name: nextcloud-autozu
+    restart: unless-stopped
+
+    
+    ports:
+      - "8095:80"
+
+    environment:
+      - MYSQL_PASSWORD=Händler1234
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_HOST=db_autozu
+
+    depends_on:
+      - db_autozu
+
+    volumes:
+      - "C:/Nextcloud_Autozu/data:/var/www/html/data"
+      - "C:/Nextcloud_Autozu/config:/var/www/html/config"
+      - "C:/Nextcloud_Autozu/apps:/var/www/html/custom_apps"
+
+      
+      - "C:/Nextcloud_Autozu/exports:/mnt/exports"
+
+    networks:
+      - autozu_net
+
+  adminer_autozu:
+    image: adminer:4
+    container_name: adminer-autozu
+    restart: unless-stopped
+    ports:
+      - "8096:8080"
+    networks:
+      - autozu_net
+
+networks:
+  autozu_net:
+    name: autozu_net
