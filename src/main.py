@@ -1,62 +1,103 @@
-# Startpunkt: verbindet Adapter + Service + GUI
-from src.ui.app import run_gui
-from src.domain.warehouse import Warehouse
-from src.domain.product import Product
+import gradio as gr
 
 
-
-# --- Minimaler InMemory-Repo + Service (falls ihr schon eigene habt: sag Bescheid, dann passe ich es an) ---
-class InMemoryRepository:
-    def __init__(self):
-        self._items = {}
-
-    def add(self, product: Product):
-        self._items[product.id] = product
-
-    def list_all(self):
-        return list(self._items.values())
+# Dummy-Daten
+products = []
 
 
-class ProductService:
-    def __init__(self, repo: InMemoryRepository, warehouse: Warehouse):
-        self.repo = repo
-        self.warehouse = warehouse
+def add_product(product_id, name, description, price, quantity):
+    try:
+        price = float(price)
+        quantity = int(quantity)
+    except ValueError:
+        return "Preis muss eine Zahl sein und Menge eine ganze Zahl.", get_product_list(), get_report()
 
-    def add_product(self, pid: str, name: str, desc: str, price: float, qty: int):
-        p = Product(id=pid, name=name, description=desc, price=price, quantity=qty)
-        # je nachdem wie euer Warehouse intern arbeitet:
-        # - wenn es dict hat: warehouse.products[pid] = p
-        # - wenn es add_product hat: warehouse.add_product(p)
-        try:
-            self.warehouse.add_product(p)
-        except Exception:
-            # fallback, falls Warehouse anders ist
-            if hasattr(self.warehouse, "products") and isinstance(self.warehouse.products, dict):
-                self.warehouse.products[p.id] = p
-        self.repo.add(p)
+    product = {
+        "id": product_id,
+        "name": name,
+        "description": description,
+        "price": price,
+        "quantity": quantity,
+    }
 
-    def list_products(self):
-        return self.repo.list_all()
+    products.append(product)
+
+    return (
+        f"Produkt '{name}' wurde hinzugefügt.",
+        get_product_list(),
+        get_report(),
+    )
 
 
-def main():
-    print("Autozuhändler Lagerverwaltung gestartet")
+def get_product_list():
+    if not products:
+        return "Noch keine Produkte vorhanden."
 
-    # Domain
-    warehouse = Warehouse("Autohaus Lager")
+    text = ""
+    for p in products:
+        text += (
+            f"ID: {p['id']} | "
+            f"Name: {p['name']} | "
+            f"Beschreibung: {p['description']} | "
+            f"Preis: {p['price']} € | "
+            f"Menge: {p['quantity']}\n"
+        )
+    return text
 
-    # Adapter
-    repo = InMemoryRepository()
 
-    # Service
-    service = ProductService(repo, warehouse)
+def get_report():
+    if not products:
+        return "Kein Report möglich, da keine Produkte vorhanden sind."
 
-    # Export-Ordner (Nextcloud External Storage zeigt /mnt/exports -> Host-Ordner)
-    export_dir = r"C:\Nextcloud_Autozu\exports"
+    total_products = len(products)
+    total_quantity = sum(p["quantity"] for p in products)
+    total_value = sum(p["price"] * p["quantity"] for p in products)
 
-    # GUI starten
-    run_gui(service, export_dir)
+    report = (
+        "Autozuhändler Lager Report\n"
+        "---------------------------\n"
+        f"Anzahl Produkte: {total_products}\n"
+        f"Gesamtmenge: {total_quantity}\n"
+        f"Gesamtwert Lager: {total_value:.2f} €\n"
+    )
+    return report
+
+
+with gr.Blocks(title="Autozuhändler System") as demo:
+    gr.Markdown("# Autozuhändler System")
+    gr.Markdown("Dummy-Oberfläche für Produkte, Liste und Lager-Report")
+
+    with gr.Row():
+        with gr.Column():
+            product_id = gr.Textbox(label="Produkt-ID")
+            name = gr.Textbox(label="Name")
+            description = gr.Textbox(label="Beschreibung")
+            price = gr.Textbox(label="Preis")
+            quantity = gr.Textbox(label="Menge")
+
+            add_button = gr.Button("Produkt hinzufügen")
+
+            status_output = gr.Textbox(label="Status", interactive=False)
+
+        with gr.Column():
+            product_list_output = gr.Textbox(
+                label="Produkte im Lager",
+                lines=12,
+                interactive=False,
+            )
+
+            report_output = gr.Textbox(
+                label="Lager Report",
+                lines=8,
+                interactive=False,
+            )
+
+    add_button.click(
+        fn=add_product,
+        inputs=[product_id, name, description, price, quantity],
+        outputs=[status_output, product_list_output, report_output],
+    )
 
 
 if __name__ == "__main__":
-    main()
+    demo.launch()
