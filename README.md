@@ -294,3 +294,11 @@ Schulprojekt - TGM
 ## Kontakt
 
 Projektverantwortung: [Rolle 1 Person]
+
+
+Nextcloud Zugriff (im gleichen Netzwerk):
+
+http://<HOST-IP>:8095
+
+Beispiel:
+http://10.0.137.217:8095
