@@ -736,7 +736,7 @@ def add_car(
     if not all([brand, model, year, mileage, fuel, color, purchase_price, sale_price, invoice_status, status]):
         return (
             *refresh_car_view(status_message="Bitte alle Pflichtfelder ausfüllen."),
-            car_id, brand, model, fuel, color, purchase_price, sale_price, customer_choice, invoice_status, status
+            car_id, brand, model, fuel, year, mileage, color, purchase_price, sale_price, customer_choice, invoice_status, status
         )
 
     try:
@@ -747,19 +747,19 @@ def add_car(
     except ValueError:
         return (
             *refresh_car_view(status_message="Baujahr und Kilometerstand müssen ganze Zahlen sein. Preise müssen Zahlen sein."),
-            car_id, brand, model, fuel, color, purchase_price, sale_price, customer_choice, invoice_status, status
+            car_id, brand, model, fuel, year, mileage, color, purchase_price, sale_price, customer_choice, invoice_status, status
         )
 
     if year < 1900 or mileage < 0 or purchase_price < 0 or sale_price < 0:
         return (
             *refresh_car_view(status_message="Bitte gültige Werte eingeben."),
-            car_id, brand, model, fuel, color, purchase_price, sale_price, customer_choice, invoice_status, status
+            car_id, brand, model, fuel, year, mileage, color, purchase_price, sale_price, customer_choice, invoice_status, status
         )
 
     if any(car["id"] == car_id for car in cars):
         return (
             *refresh_car_view(status_message=f"Die Fahrzeug-ID '{car_id}' existiert bereits."),
-            car_id, brand, model, fuel, color, purchase_price, sale_price, customer_choice, invoice_status, status
+            car_id, brand, model, fuel, year, mileage, color, purchase_price, sale_price, customer_choice, invoice_status, status
         )
 
     sale_date = datetime.now().strftime("%d.%m.%Y") if status == "Verkauft" else ""
@@ -1832,9 +1832,10 @@ with gr.Blocks(title=APP_TITLE, elem_id="dashboard-root") as demo:
         outputs=[
             car_status_msg, car_table, car_report, car_kpi_1, car_kpi_2, car_kpi_3, car_kpi_4, car_kpi_5,
             car_chart, car_brand_filter, car_edit_select, car_customer, car_id,
-            car_id, car_brand, car_model, car_fuel, car_color, car_purchase_price,
-            car_sale_price, car_customer, car_invoice_status, car_status
+            car_id, car_brand, car_model, car_fuel, car_year, car_mileage,
+            car_color, car_purchase_price, car_sale_price, car_customer, car_invoice_status, car_status
         ],
+        
     )
 
     car_load_btn.click(
