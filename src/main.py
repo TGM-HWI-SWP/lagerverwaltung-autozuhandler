@@ -1245,7 +1245,7 @@ def export_text_report(filename_prefix: str, text: str) -> str:
     filename = f"{filename_prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
     filepath = NEXTCLOUD_EXPORT_DIR / filename
     filepath.write_text(text, encoding="utf-8")
-    return f"Export erfolgreich:\n{filepath}"
+    return f"Export erfolgreich in Nextcloud:\n{filepath}"
 
 
 def export_dataframe_csv(df: pd.DataFrame, filename_prefix: str) -> str:
@@ -1640,7 +1640,7 @@ with gr.Blocks(title=APP_TITLE, elem_id="dashboard-root") as demo:
                     car_chart = gr.Plot(label="Fahrzeuge pro Status")
 
             with gr.Row():
-                car_export_txt_btn = gr.Button("TXT exportieren", variant="primary", elem_classes=["primary-btn"])
+                car_export_txt_btn = gr.Button("TXT exportieren in Nextcloud", variant="primary", elem_classes=["primary-btn"])
                 car_export_csv_btn = gr.Button("CSV exportieren", elem_classes=["secondary-btn"])
                 car_export_xlsx_btn = gr.Button("Excel exportieren", elem_classes=["secondary-btn"])
             car_export_status = gr.Textbox(label="Exportstatus", interactive=False)
@@ -1708,7 +1708,7 @@ with gr.Blocks(title=APP_TITLE, elem_id="dashboard-root") as demo:
                     part_chart = gr.Plot(label="Teilebestand nach Status")
 
             with gr.Row():
-                part_export_txt_btn = gr.Button("TXT exportieren", variant="primary", elem_classes=["primary-btn"])
+                part_export_txt_btn = gr.Button("TXT exportieren in Nextcloud", variant="primary", elem_classes=["primary-btn"])
                 part_export_csv_btn = gr.Button("CSV exportieren", elem_classes=["secondary-btn"])
                 part_export_xlsx_btn = gr.Button("Excel exportieren", elem_classes=["secondary-btn"])
             part_export_status = gr.Textbox(label="Exportstatus", interactive=False)
@@ -1759,7 +1759,7 @@ with gr.Blocks(title=APP_TITLE, elem_id="dashboard-root") as demo:
                     customer_chart = gr.Plot(label="Kundenkontakte")
 
             with gr.Row():
-                customer_export_txt_btn = gr.Button("TXT exportieren", variant="primary", elem_classes=["primary-btn"])
+                customer_export_txt_btn = gr.Button("TXT exportieren in Nextcloud", variant="primary", elem_classes=["primary-btn"])
                 customer_export_csv_btn = gr.Button("CSV exportieren", elem_classes=["secondary-btn"])
                 customer_export_xlsx_btn = gr.Button("Excel exportieren", elem_classes=["secondary-btn"])
             customer_export_status = gr.Textbox(label="Exportstatus", interactive=False)
