@@ -11,7 +11,7 @@ import pandas as pd
 # =========================================================
 # Konfiguration
 # =========================================================
-APP_TITLE = "Autozuhändler Dashboard Pro"
+APP_TITLE = "Autozuhändler"
 NEXTCLOUD_EXPORT_DIR = Path(r"C:\Nextcloud_Autozu\exports")
 NEXTCLOUD_EXPORT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -708,7 +708,18 @@ def logout_user():
 # =========================================================
 def clear_car_form():
     return (
-        get_next_car_id(), "", "", None, "", "", "", "", "-", "Offen", None
+        get_next_car_id(),  # car_id
+        "",                 # car_brand
+        "",                 # car_model
+        None,               # car_fuel
+        "",                 # car_year
+        "",                 # car_mileage
+        "",                 # car_color
+        "",                 # car_purchase_price
+        "",                 # car_sale_price
+        "-",                # car_customer
+        "Offen",            # car_invoice_status
+        None,               # car_status
     )
 
 
