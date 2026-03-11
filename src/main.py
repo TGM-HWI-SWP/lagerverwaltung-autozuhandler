@@ -1556,7 +1556,7 @@ with gr.Blocks(title=APP_TITLE, elem_id="dashboard-root") as demo:
     with login_container:
         gr.HTML("""
         <div class="main-title">
-            <h1>Autozuhändler Dashboard Pro</h1>
+            <h1>Autozuhändler</h1>
             <p>Mitarbeiter-Login für Fahrzeuge, Teile, Kunden und Verkaufsverwaltung.</p>
         </div>
         """)
@@ -1581,7 +1581,7 @@ with gr.Blocks(title=APP_TITLE, elem_id="dashboard-root") as demo:
     with app_container:
         gr.HTML("""
         <div class="main-title">
-            <h1>Autozuhändler Dashboard Pro</h1>
+            <h1>Autozuhändler</h1>
             <p>Verwaltung von Fahrzeugen, Teilen, Kunden, Verkauf, Rechnungsstatus und Exporten.</p>
         </div>
         """)
