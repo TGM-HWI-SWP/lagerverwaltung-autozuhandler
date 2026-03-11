@@ -18,10 +18,10 @@ NEXTCLOUD_EXPORT_DIR.mkdir(parents=True, exist_ok=True)
 # Demo-Mitarbeiter-Login
 # In einer echten produktiven App bitte Passwörter hashen und nicht im Code speichern.
 EMPLOYEES = {
-    "admin": {"password": "admin123", "role": "Admin", "name": "Julian"},
-    "admin2": {"password": "admin456", "role": "Admin", "name": "Fabienne"},
-    "admin3": {"password": "admin789", "role": "Admin", "name": "Miki"},
-    "admin4": {"password": "admin000", "role": "Admin", "name": "Sirin"},
+    "admin": {"password": "admin123", "role": "Julian", "name": "Julian"},
+    "admin2": {"password": "admin456", "role": "Fabienne", "name": "Fabienne"},
+    "admin3": {"password": "admin789", "role": "Mikail", "name": "Miki"},
+    "admin4": {"password": "admin000", "role": "Sirin", "name": "Sirin"},
     "verkauf": {"password": "verkauf123", "role": "Mitarbeiter", "name": "Max Verkauf"},
     "lager": {"password": "lager123", "role": "Mitarbeiter", "name": "Lena Lager"},
     "lehrer": {"password": "lehrer123", "role": "Lehrer", "name": "Schobi Ratschi"},
