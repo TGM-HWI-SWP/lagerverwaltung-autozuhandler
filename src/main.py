@@ -1021,7 +1021,7 @@ def update_part(selected_id, part_id, name, category, brand, price, stock, statu
 
     if not all([name, category, brand, price, stock, status]):
         return (
-            *refresh_part_view(status_message="Bitte alle Felder ausfüllen."),
+            *refresh_part_view(status_message="Bitte alle Felder korrekt ausfüllen."),
             part_id, name, category, brand, price, stock, status
         )
 
