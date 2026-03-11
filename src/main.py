@@ -18,10 +18,10 @@ NEXTCLOUD_EXPORT_DIR.mkdir(parents=True, exist_ok=True)
 # Demo-Mitarbeiter-Login
 # In einer echten produktiven App bitte Passwörter hashen und nicht im Code speichern.
 EMPLOYEES = {
-    "admin": {"password": "admin123", "role": "Julian", "name": "Julian"},
-    "admin2": {"password": "admin456", "role": "Fabienne", "name": "Fabienne"},
-    "admin3": {"password": "admin789", "role": "Mikail", "name": "Miki"},
-    "admin4": {"password": "admin000", "role": "Sirin", "name": "Sirin"},
+    "Julian": {"password": "admin123", "role": "admin", "name": "Julian"},
+    "Fabienne": {"password": "admin456", "role": "admin", "name": "Fabienne"},
+    "Mikail": {"password": "admin789", "role": "admin", "name": "Miki"},
+    "Sirin": {"password": "admin000", "role": "admin", "name": "Sirin"},
     "verkauf": {"password": "verkauf123", "role": "Mitarbeiter", "name": "Max Verkauf"},
     "lager": {"password": "lager123", "role": "Mitarbeiter", "name": "Lena Lager"},
     "lehrer": {"password": "lehrer123", "role": "Lehrer", "name": "Schobi Ratschi"},
@@ -1559,10 +1559,10 @@ with gr.Blocks(title=APP_TITLE, elem_id="dashboard-root") as demo:
                 gr.HTML("""
                 <div class="legend-box">
                     <b>Demo-Zugänge</b><br><br>
-                    admin / admin123<br>
-                    admin2 / admin456<br>
-                    admin3 / admin789<br>
-                    admin4 / admin000<br>
+                    Julian / admin123<br>
+                    Fabienne / admin456<br>
+                    Mikail / admin789<br>
+                    Sirin / admin000<br>
                     lehrer / lehrer123
                 </div>
                 """)
