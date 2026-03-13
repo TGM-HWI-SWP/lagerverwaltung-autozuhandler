@@ -31,7 +31,7 @@ cars: list[dict] = []
 parts: list[dict] = []
 customers: list[dict] = []
 
-brand_db = ["Audi", "BMW", "Mercedes", "VW", "Skoda", "Toyota", "Ford", "Tesla"]
+brand_db = ["Audi", "BMW", "Mercedes", "VW", "Skoda", "Toyota", "Ford", "Tesla", "Porsche", "Opel"]
 category_db = ["Reifen", "Felgen", "Bremsen", "Öl", "Batterie", "Licht", "Innenraum", "Zubehör"]
 
 SPECIAL_WORDS = {
@@ -49,6 +49,8 @@ SPECIAL_WORDS = {
     "xenon": "Xenon",
     "suv": "SUV",
     "gti": "GTI",
+    "porsche": "Porsche",
+    "opel": "Opel"
 }
 
 CAR_STATUSES = ["Verfügbar", "Reserviert", "Verkauft"]
