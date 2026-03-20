@@ -1,48 +1,63 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from typing import Generic, Optional, TypeVar
-
-from domain.models.car import Car
-from domain.models.part import Part
-from domain.models.customer import Customer
-
-T = TypeVar("T")
+from typing import Protocol
 
 
-class Repository(ABC, Generic[T]):
-    @abstractmethod
-    def list_all(self) -> list[T]:
-        raise NotImplementedError
+class CarRepositoryPort(Protocol):
+    def add(self, car: dict) -> None:
+        ...
 
-    @abstractmethod
-    def get_by_id(self, entity_id: str) -> Optional[T]:
-        raise NotImplementedError
+    def get_all(self) -> list[dict]:
+        ...
 
-    @abstractmethod
-    def exists(self, entity_id: str) -> bool:
-        raise NotImplementedError
+    def get_by_id(self, car_id: str) -> dict | None:
+        ...
 
-    @abstractmethod
-    def add(self, entity: T) -> None:
-        raise NotImplementedError
+    def update(self, car: dict) -> None:
+        ...
 
-    @abstractmethod
-    def update(self, entity: T) -> None:
-        raise NotImplementedError
+    def delete(self, car_id: str) -> bool:
+        ...
 
-    @abstractmethod
-    def delete(self, entity_id: str) -> None:
-        raise NotImplementedError
+    def exists(self, car_id: str) -> bool:
+        ...
 
 
-class CarRepository(Repository[Car], ABC):
-    pass
+class PartRepositoryPort(Protocol):
+    def add(self, part: dict) -> None:
+        ...
+
+    def get_all(self) -> list[dict]:
+        ...
+
+    def get_by_id(self, part_id: str) -> dict | None:
+        ...
+
+    def update(self, part: dict) -> None:
+        ...
+
+    def delete(self, part_id: str) -> bool:
+        ...
+
+    def exists(self, part_id: str) -> bool:
+        ...
 
 
-class PartRepository(Repository[Part], ABC):
-    pass
+class CustomerRepositoryPort(Protocol):
+    def add(self, customer: dict) -> None:
+        ...
 
+    def get_all(self) -> list[dict]:
+        ...
 
-class CustomerRepository(Repository[Customer], ABC):
-    pass
+    def get_by_id(self, customer_id: str) -> dict | None:
+        ...
+
+    def update(self, customer: dict) -> None:
+        ...
+
+    def delete(self, customer_id: str) -> bool:
+        ...
+
+    def exists(self, customer_id: str) -> bool:
+        ...

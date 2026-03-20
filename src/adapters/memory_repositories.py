@@ -1,77 +1,114 @@
 from __future__ import annotations
 
-from typing import Dict, Optional
+from copy import deepcopy
 
-from domain.models.car import Car
-from domain.models.customer import Customer
-from domain.models.part import Part
-from ports.repositories import CarRepository, CustomerRepository, PartRepository
+from src.ports.repositories import (
+    CarRepositoryPort,
+    CustomerRepositoryPort,
+    PartRepositoryPort,
+)
 
 
-class InMemoryCarRepository(CarRepository):
+class InMemoryCarRepository(CarRepositoryPort):
     def __init__(self) -> None:
-        self._items: Dict[str, Car] = {}
+        self._cars: list[dict] = []
 
-    def list_all(self) -> list[Car]:
-        return list(self._items.values())
+    def add(self, car: dict) -> None:
+        self._cars.append(deepcopy(car))
 
-    def get_by_id(self, entity_id: str) -> Optional[Car]:
-        return self._items.get(entity_id)
+    def get_all(self) -> list[dict]:
+        return [deepcopy(car) for car in self._cars]
 
-    def exists(self, entity_id: str) -> bool:
-        return entity_id in self._items
+    def get_by_id(self, car_id: str) -> dict | None:
+        for car in self._cars:
+            if car.get("id") == car_id:
+                return deepcopy(car)
+        return None
 
-    def add(self, entity: Car) -> None:
-        self._items[entity.id] = entity
+    def update(self, car: dict) -> None:
+        car_id = car.get("id")
+        for index, current in enumerate(self._cars):
+            if current.get("id") == car_id:
+                self._cars[index] = deepcopy(car)
+                return
+        raise ValueError(f"Fahrzeug mit ID '{car_id}' wurde nicht gefunden.")
 
-    def update(self, entity: Car) -> None:
-        self._items[entity.id] = entity
+    def delete(self, car_id: str) -> bool:
+        for index, car in enumerate(self._cars):
+            if car.get("id") == car_id:
+                del self._cars[index]
+                return True
+        return False
 
-    def delete(self, entity_id: str) -> None:
-        self._items.pop(entity_id, None)
+    def exists(self, car_id: str) -> bool:
+        return any(car.get("id") == car_id for car in self._cars)
 
 
-class InMemoryPartRepository(PartRepository):
+class InMemoryPartRepository(PartRepositoryPort):
     def __init__(self) -> None:
-        self._items: Dict[str, Part] = {}
+        self._parts: list[dict] = []
 
-    def list_all(self) -> list[Part]:
-        return list(self._items.values())
+    def add(self, part: dict) -> None:
+        self._parts.append(deepcopy(part))
 
-    def get_by_id(self, entity_id: str) -> Optional[Part]:
-        return self._items.get(entity_id)
+    def get_all(self) -> list[dict]:
+        return [deepcopy(part) for part in self._parts]
 
-    def exists(self, entity_id: str) -> bool:
-        return entity_id in self._items
+    def get_by_id(self, part_id: str) -> dict | None:
+        for part in self._parts:
+            if part.get("id") == part_id:
+                return deepcopy(part)
+        return None
 
-    def add(self, entity: Part) -> None:
-        self._items[entity.id] = entity
+    def update(self, part: dict) -> None:
+        part_id = part.get("id")
+        for index, current in enumerate(self._parts):
+            if current.get("id") == part_id:
+                self._parts[index] = deepcopy(part)
+                return
+        raise ValueError(f"Teil mit ID '{part_id}' wurde nicht gefunden.")
 
-    def update(self, entity: Part) -> None:
-        self._items[entity.id] = entity
+    def delete(self, part_id: str) -> bool:
+        for index, part in enumerate(self._parts):
+            if part.get("id") == part_id:
+                del self._parts[index]
+                return True
+        return False
 
-    def delete(self, entity_id: str) -> None:
-        self._items.pop(entity_id, None)
+    def exists(self, part_id: str) -> bool:
+        return any(part.get("id") == part_id for part in self._parts)
 
 
-class InMemoryCustomerRepository(CustomerRepository):
+class InMemoryCustomerRepository(CustomerRepositoryPort):
     def __init__(self) -> None:
-        self._items: Dict[str, Customer] = {}
+        self._customers: list[dict] = []
 
-    def list_all(self) -> list[Customer]:
-        return list(self._items.values())
+    def add(self, customer: dict) -> None:
+        self._customers.append(deepcopy(customer))
 
-    def get_by_id(self, entity_id: str) -> Optional[Customer]:
-        return self._items.get(entity_id)
+    def get_all(self) -> list[dict]:
+        return [deepcopy(customer) for customer in self._customers]
 
-    def exists(self, entity_id: str) -> bool:
-        return entity_id in self._items
+    def get_by_id(self, customer_id: str) -> dict | None:
+        for customer in self._customers:
+            if customer.get("id") == customer_id:
+                return deepcopy(customer)
+        return None
 
-    def add(self, entity: Customer) -> None:
-        self._items[entity.id] = entity
+    def update(self, customer: dict) -> None:
+        customer_id = customer.get("id")
+        for index, current in enumerate(self._customers):
+            if current.get("id") == customer_id:
+                self._customers[index] = deepcopy(customer)
+                return
+        raise ValueError(f"Kunde mit ID '{customer_id}' wurde nicht gefunden.")
 
-    def update(self, entity: Customer) -> None:
-        self._items[entity.id] = entity
+    def delete(self, customer_id: str) -> bool:
+        for index, customer in enumerate(self._customers):
+            if customer.get("id") == customer_id:
+                del self._customers[index]
+                return True
+        return False
 
-    def delete(self, entity_id: str) -> None:
-        self._items.pop(entity_id, None)
+    def exists(self, customer_id: str) -> bool:
+        return any(customer.get("id") == customer_id for customer in self._customers)

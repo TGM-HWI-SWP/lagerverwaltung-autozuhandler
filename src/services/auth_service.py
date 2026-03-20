@@ -1,40 +1,49 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-
-from domain.enums import UserRole
-from services.formatting_service import safe_str
-
-
-@dataclass(frozen=True)
-class Employee:
-    username: str
-    password: str
-    role: UserRole
-    name: str
+from src.services.formatting_service import safe_str
+from src.services.service_result import ServiceResult
 
 
 class AuthService:
     def __init__(self) -> None:
-        self._employees: dict[str, Employee] = {
-            "Julian": Employee("Julian", "admin123", UserRole.ADMIN, "Julian"),
-            "Fabienne": Employee("Fabienne", "admin456", UserRole.ADMIN, "Fabienne"),
-            "Mikail": Employee("Mikail", "admin789", UserRole.ADMIN, "Miki"),
-            "Sirin": Employee("Sirin", "admin000", UserRole.ADMIN, "Sirin"),
-            "verkauf": Employee("verkauf", "verkauf123", UserRole.EMPLOYEE, "Max Verkauf"),
-            "lager": Employee("lager", "lager123", UserRole.EMPLOYEE, "Lena Lager"),
-            "lehrer": Employee("lehrer", "lehrer123", UserRole.TEACHER, "Schobi Ratschi"),
+        self._employees = {
+            "Julian": {"password": "admin123", "role": "Admin", "name": "Julian"},
+            "Fabienne": {"password": "admin456", "role": "Admin", "name": "Fabienne"},
+            "Mikail": {"password": "admin789", "role": "Admin", "name": "Mikail"},
+            "Sirin": {"password": "admin000", "role": "Admin", "name": "Sirin"},
+            "verkauf": {"password": "verkauf123", "role": "Mitarbeiter", "name": "Max Verkauf"},
+            "lager": {"password": "lager123", "role": "Mitarbeiter", "name": "Lena Lager"},
+            "lehrer": {"password": "lehrer123", "role": "Lehrer", "name": "Schobi Ratschi"},
         }
 
-    def login(self, username: str, password: str) -> Employee:
-        username = safe_str(username)
-        password = safe_str(password)
+    def login(self, username: object, password: object) -> ServiceResult:
+        prepared_username = safe_str(username)
+        prepared_password = safe_str(password)
 
-        if username not in self._employees:
-            raise ValueError("Unbekannter Benutzer.")
+        if prepared_username not in self._employees:
+            return ServiceResult.fail("Unbekannter Benutzer.")
 
-        employee = self._employees[username]
-        if password != employee.password:
-            raise ValueError("Falsches Passwort.")
+        user = self._employees[prepared_username]
+        if prepared_password != user["password"]:
+            return ServiceResult.fail("Falsches Passwort.")
 
-        return employee
+        return ServiceResult.ok(
+            f"Angemeldet als {user['name']} ({user['role']})",
+            name=user["name"],
+            role=user["role"],
+            username=prepared_username,
+        )
+
+    def logout(self) -> ServiceResult:
+        return ServiceResult.ok("Abgemeldet.")
+
+    def get_demo_logins(self) -> list[str]:
+        return [
+            "Julian / admin123",
+            "Fabienne / admin456",
+            "Mikail / admin789",
+            "Sirin / admin000",
+            "verkauf / verkauf123",
+            "lager / lager123",
+            "lehrer / lehrer123",
+        ]
