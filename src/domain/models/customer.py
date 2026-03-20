@@ -1,12 +1,12 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 
 @dataclass
-class Part:
+class Customer:
     id: str
     name: str
-    category: str
-    brand: str
-    price: float
-    stock: int
-    status: str = "Verfügbar"
+    phone: str = ""
+    email: str = ""
+    address: str = ""

@@ -1,78 +1,40 @@
-from src.domain.enums import SPECIAL_WORDS
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from domain.enums import UserRole
+from services.formatting_service import safe_str
 
 
-def smart_capitalize(text) -> str:
-    if text is None:
-        return ""
-    text = str(text).strip()
-    if not text:
-        return ""
-
-    words = text.split()
-    result = []
-
-    for word in words:
-        lower_word = word.lower()
-        if lower_word in SPECIAL_WORDS:
-            result.append(SPECIAL_WORDS[lower_word])
-        elif "-" in word:
-            parts_dash = []
-            for part in word.split("-"):
-                p = part.lower()
-                if p in SPECIAL_WORDS:
-                    parts_dash.append(SPECIAL_WORDS[p])
-                else:
-                    parts_dash.append(part[:1].upper() + part[1:].lower() if part else "")
-            result.append("-".join(parts_dash))
-        else:
-            result.append(word[:1].upper() + word[1:].lower())
-
-    return " ".join(result)
+@dataclass(frozen=True)
+class Employee:
+    username: str
+    password: str
+    role: UserRole
+    name: str
 
 
-def safe_str(value) -> str:
-    return "" if value is None else str(value).strip()
+class AuthService:
+    def __init__(self) -> None:
+        self._employees: dict[str, Employee] = {
+            "Julian": Employee("Julian", "admin123", UserRole.ADMIN, "Julian"),
+            "Fabienne": Employee("Fabienne", "admin456", UserRole.ADMIN, "Fabienne"),
+            "Mikail": Employee("Mikail", "admin789", UserRole.ADMIN, "Miki"),
+            "Sirin": Employee("Sirin", "admin000", UserRole.ADMIN, "Sirin"),
+            "verkauf": Employee("verkauf", "verkauf123", UserRole.EMPLOYEE, "Max Verkauf"),
+            "lager": Employee("lager", "lager123", UserRole.EMPLOYEE, "Lena Lager"),
+            "lehrer": Employee("lehrer", "lehrer123", UserRole.TEACHER, "Schobi Ratschi"),
+        }
 
+    def login(self, username: str, password: str) -> Employee:
+        username = safe_str(username)
+        password = safe_str(password)
 
-def format_currency(value) -> str:
-    try:
-        return f"{float(value):.2f} €"
-    except Exception:
-        return "0.00 €"
+        if username not in self._employees:
+            raise ValueError("Unbekannter Benutzer.")
 
+        employee = self._employees[username]
+        if password != employee.password:
+            raise ValueError("Falsches Passwort.")
 
-def part_status_badge(status: str) -> str:
-    mapping = {
-        "Verfügbar": "🟢 Verfügbar",
-        "Nachbestellen": "🟡 Nachbestellen",
-        "Nicht verfügbar": "🔴 Nicht verfügbar",
-    }
-    return mapping.get(status, status)
-
-
-def invoice_status_badge(status: str) -> str:
-    mapping = {
-        "Offen": "🟠 Offen",
-        "Bezahlt": "🟢 Bezahlt",
-        "Storniert": "🔴 Storniert",
-    }
-    return mapping.get(status, status)
-
-
-def calc_profit(purchase_price, sale_price) -> float:
-    try:
-        return float(sale_price) - float(purchase_price)
-    except Exception:
-        return 0.0
-
-
-def normalize_db_list(values):
-    seen = set()
-    result = []
-    for v in values:
-        val = str(v).strip()
-        if val and val.lower() not in seen:
-            seen.add(val.lower())
-            result.append(val)
-    result.sort(key=lambda x: x.lower())
-    return result
+        return employee

@@ -1,14 +1,13 @@
 services:
   db_autozu:
     image: mariadb:11
-    container_name: nextcloud-autozu-db
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     environment:
-      - MYSQL_ROOT_PASSWORD=Händler1234
-      - MYSQL_PASSWORD=Händler1234
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
+      MYSQL_ROOT_PASSWORD: Händler1234
+      MYSQL_PASSWORD: Händler1234
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
     volumes:
       - "C:/Nextcloud_Autozu/db:/var/lib/mysql"
     networks:
@@ -16,19 +15,18 @@ services:
 
   app_autozu:
     image: nextcloud:apache
-    container_name: nextcloud-autozu
     restart: unless-stopped
     ports:
       - "8095:80"
     environment:
-      - MYSQL_PASSWORD=Händler1234
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-      - MYSQL_HOST=db_autozu
+      MYSQL_PASSWORD: Händler1234
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_HOST: db_autozu
     depends_on:
       - db_autozu
     volumes:
-      - "C:/Nextcloud_Autozu/data:/var/www/html/data"
+      - "C:/Nextcloud_Autozu/ncdata:/var/www/html/data"
       - "C:/Nextcloud_Autozu/config:/var/www/html/config"
       - "C:/Nextcloud_Autozu/apps:/var/www/html/custom_apps"
       - "C:/Nextcloud_Autozu/exports:/mnt/exports"
@@ -37,22 +35,20 @@ services:
 
   collabora_autozu:
     image: collabora/code
-    container_name: collabora-autozu
     restart: unless-stopped
     cap_add:
       - MKNOD
     ports:
       - "9980:9980"
     environment:
-      - domain=10.0.136.94
+      - domain=10\.0\.136\.1|localhost|app_autozu
       - DONT_GEN_SSL_CERT=true
-      - extra_params=--o:ssl.enable=false --o:ssl.termination=false
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=false --o:server_name=10.0.136.1:9980 --o:storage.wopi.host=10\\.0\\.136\\.1(:8095)?|localhost(:8095)?|app_autozu(:80)?
     networks:
       - autozu_net
 
   adminer_autozu:
     image: adminer:4
-    container_name: adminer-autozu
     restart: unless-stopped
     ports:
       - "8096:8080"
@@ -61,4 +57,4 @@ services:
 
 networks:
   autozu_net:
-    name: autozu_net
+    external: true

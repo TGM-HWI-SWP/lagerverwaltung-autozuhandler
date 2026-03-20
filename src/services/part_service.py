@@ -1,34 +1,56 @@
-from src.domain.models.part import Part
-from src.services.formatting_service import smart_capitalize, safe_str
+from __future__ import annotations
+
+from typing import Optional
+
+from domain.enums import PartStatus
+from domain.models.part import Part
+from ports.repositories import PartRepository
+from services.formatting_service import safe_str, smart_capitalize
+from services.id_service import get_next_part_id
 
 
 class PartService:
-    def __init__(self, part_repo):
+    def __init__(self, part_repo: PartRepository) -> None:
         self.part_repo = part_repo
 
-    def add_part(self, part_id, name, category, brand, price, stock, status):
-        part_id = safe_str(part_id).upper()
-        name = smart_capitalize(name)
-        category = smart_capitalize(category)
-        brand = smart_capitalize(brand)
+    def list_all(self) -> list[Part]:
+        return self.part_repo.list_all()
 
-        if not all([part_id, name, category, brand, price, stock, status]):
-            raise ValueError("Bitte alle Felder ausfüllen.")
+    def get_by_id(self, part_id: str) -> Optional[Part]:
+        return self.part_repo.get_by_id(safe_str(part_id))
 
-        try:
-            price = float(price)
-            stock = int(stock)
-        except ValueError:
-            raise ValueError("Preis muss eine Zahl sein, Bestand eine ganze Zahl.")
+    def get_next_id(self) -> str:
+        return get_next_part_id(self.part_repo)
 
-        if price < 0 or stock < 0:
-            raise ValueError("Bitte gültige Werte eingeben.")
+    def get_category_choices(self) -> list[str]:
+        categories = [part.category for part in self.part_repo.list_all() if safe_str(part.category)]
+        seen: set[str] = set()
+        result: list[str] = []
 
-        if self.part_repo.get_by_id(part_id):
-            raise ValueError(f"Die Teile-ID '{part_id}' existiert bereits.")
+        for category in sorted(categories, key=lambda x: x.lower()):
+            if category.lower() not in seen:
+                seen.add(category.lower())
+                result.append(category)
 
-        part = Part(
-            id=part_id,
+        return result
+
+    def create(
+        self,
+        part_id: str,
+        name: str,
+        category: str,
+        brand: str,
+        price: str,
+        stock: str,
+        status: str,
+    ) -> Part:
+        normalized_id = safe_str(part_id).upper() or self.get_next_id()
+
+        if self.part_repo.exists(normalized_id):
+            raise ValueError(f"Die Teile-ID '{normalized_id}' existiert bereits.")
+
+        part = self._build_part(
+            part_id=normalized_id,
             name=name,
             category=category,
             brand=brand,
@@ -39,43 +61,114 @@ class PartService:
         self.part_repo.add(part)
         return part
 
-    def get_part(self, part_id: str):
-        return self.part_repo.get_by_id(part_id)
+    def update(
+        self,
+        selected_id: str,
+        name: str,
+        category: str,
+        brand: str,
+        price: str,
+        stock: str,
+        status: str,
+    ) -> Part:
+        normalized_selected_id = safe_str(selected_id)
+        if not normalized_selected_id:
+            raise ValueError("Bitte zuerst ein Teil zum Bearbeiten auswählen.")
 
-    def update_part(self, selected_id, name, category, brand, price, stock, status):
-        part = self.part_repo.get_by_id(selected_id)
-        if not part:
+        existing = self.part_repo.get_by_id(normalized_selected_id)
+        if existing is None:
             raise ValueError("Teil nicht gefunden.")
 
-        name = smart_capitalize(name)
-        category = smart_capitalize(category)
-        brand = smart_capitalize(brand)
+        updated = self._build_part(
+            part_id=existing.id,
+            name=name,
+            category=category,
+            brand=brand,
+            price=price,
+            stock=stock,
+            status=status,
+        )
+        self.part_repo.update(updated)
+        return updated
 
-        if not all([name, category, brand, price, stock, status]):
-            raise ValueError("Bitte alle Felder korrekt ausfüllen.")
+    def delete(self, selected_id: str) -> Part:
+        normalized_selected_id = safe_str(selected_id)
+        if not normalized_selected_id:
+            raise ValueError("Bitte zuerst ein Teil auswählen.")
+
+        existing = self.part_repo.get_by_id(normalized_selected_id)
+        if existing is None:
+            raise ValueError("Teil nicht gefunden.")
+
+        self.part_repo.delete(normalized_selected_id)
+        return existing
+
+    def filter(
+        self,
+        search_term: str = "",
+        category_filter: str = "Alle",
+        status_filter: str = "Alle",
+    ) -> list[Part]:
+        parts = self.part_repo.list_all()
+        term = safe_str(search_term).lower()
+
+        if term:
+            parts = [
+                part for part in parts
+                if term in part.id.lower()
+                or term in part.name.lower()
+                or term in part.category.lower()
+                or term in part.brand.lower()
+                or term in part.status.value.lower()
+            ]
+
+        if category_filter != "Alle":
+            parts = [part for part in parts if part.category == category_filter]
+
+        if status_filter != "Alle":
+            parts = [part for part in parts if part.status.value == status_filter]
+
+        return parts
+
+    def _build_part(
+        self,
+        part_id: str,
+        name: str,
+        category: str,
+        brand: str,
+        price: str,
+        stock: str,
+        status: str,
+    ) -> Part:
+        normalized_name = smart_capitalize(name)
+        normalized_category = smart_capitalize(category)
+        normalized_brand = smart_capitalize(brand)
+
+        if not all([
+            normalized_name,
+            normalized_category,
+            normalized_brand,
+            safe_str(price),
+            safe_str(stock),
+            safe_str(status),
+        ]):
+            raise ValueError("Bitte alle Felder ausfüllen.")
 
         try:
-            price = float(price)
-            stock = int(stock)
-        except ValueError:
-            raise ValueError("Preis muss eine Zahl sein, Bestand eine ganze Zahl.")
+            parsed_price = float(price)
+            parsed_stock = int(stock)
+        except ValueError as exc:
+            raise ValueError("Preis muss eine Zahl sein, Bestand eine ganze Zahl.") from exc
 
-        part.name = name
-        part.category = category
-        part.brand = brand
-        part.price = price
-        part.stock = stock
-        part.status = status
+        if parsed_price < 0 or parsed_stock < 0:
+            raise ValueError("Bitte gültige Werte eingeben.")
 
-        self.part_repo.update(part)
-        return part
-
-    def delete_part(self, selected_id: str):
-        part = self.part_repo.get_by_id(selected_id)
-        if not part:
-            raise ValueError("Teil nicht gefunden.")
-        self.part_repo.delete(selected_id)
-        return part
-
-    def list_all(self):
-        return self.part_repo.list_all()
+        return Part(
+            id=part_id,
+            name=normalized_name,
+            category=normalized_category,
+            brand=normalized_brand,
+            price=parsed_price,
+            stock=parsed_stock,
+            status=PartStatus(status),
+        )

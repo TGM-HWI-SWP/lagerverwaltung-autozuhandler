@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Optional
+
+from domain.enums import CarStatus, FuelType, InvoiceStatus
 
 
 @dataclass
@@ -9,11 +13,15 @@ class Car:
     model: str
     year: int
     mileage: int
-    fuel: str
+    fuel: FuelType
     color: str
     purchase_price: float
     sale_price: float
-    customer_id: Optional[str] = ""
+    customer_id: Optional[str] = None
     sale_date: str = ""
-    invoice_status: str = "Offen"
-    status: str = "Verfügbar"
+    invoice_status: InvoiceStatus = InvoiceStatus.OPEN
+    status: CarStatus = CarStatus.AVAILABLE
+
+    @property
+    def profit(self) -> float:
+        return self.sale_price - self.purchase_price

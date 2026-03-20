@@ -1,24 +1,38 @@
-CAR_STATUSES = ["Verfügbar", "Reserviert", "Verkauft"]
-PART_STATUSES = ["Verfügbar", "Nachbestellen", "Nicht verfügbar"]
-INVOICE_STATUSES = ["Offen", "Bezahlt", "Storniert"]
-FUELS = ["Benzin", "Diesel", "Hybrid", "Elektro"]
+from enum import StrEnum
 
-DEFAULT_BRANDS = ["Audi", "BMW", "Mercedes", "VW", "Skoda", "Toyota", "Ford", "Tesla"]
-DEFAULT_CATEGORIES = ["Reifen", "Felgen", "Bremsen", "Öl", "Batterie", "Licht", "Innenraum", "Zubehör"]
 
-SPECIAL_WORDS = {
-    "bmw": "BMW",
-    "vw": "VW",
-    "audi": "Audi",
-    "mercedes": "Mercedes",
-    "skoda": "Skoda",
-    "toyota": "Toyota",
-    "ford": "Ford",
-    "tesla": "Tesla",
-    "öl": "Öl",
-    "abs": "ABS",
-    "led": "LED",
-    "xenon": "Xenon",
-    "suv": "SUV",
-    "gti": "GTI",
-}
+class UserRole(StrEnum):
+    ADMIN = "admin"
+    EMPLOYEE = "Mitarbeiter"
+    TEACHER = "Lehrer"
+
+
+class CarStatus(StrEnum):
+    AVAILABLE = "Verfügbar"
+    RESERVED = "Reserviert"
+    SOLD = "Verkauft"
+
+
+class PartStatus(StrEnum):
+    AVAILABLE = "Verfügbar"
+    REORDER = "Nachbestellen"
+    UNAVAILABLE = "Nicht verfügbar"
+
+
+class InvoiceStatus(StrEnum):
+    OPEN = "Offen"
+    PAID = "Bezahlt"
+    CANCELED = "Storniert"
+
+
+class FuelType(StrEnum):
+    PETROL = "Benzin"
+    DIESEL = "Diesel"
+    HYBRID = "Hybrid"
+    ELECTRIC = "Elektro"
+
+
+CAR_STATUSES = [status.value for status in CarStatus]
+PART_STATUSES = [status.value for status in PartStatus]
+INVOICE_STATUSES = [status.value for status in InvoiceStatus]
+FUELS = [fuel.value for fuel in FuelType]

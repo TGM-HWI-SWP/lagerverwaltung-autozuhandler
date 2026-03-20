@@ -1,68 +1,151 @@
-from src.domain.models.customer import Customer
-from src.services.formatting_service import smart_capitalize, safe_str
+from __future__ import annotations
+
+from typing import Optional
+
+from domain.models.customer import Customer
+from ports.repositories import CarRepository, CustomerRepository
+from services.formatting_service import safe_str, smart_capitalize
+from services.id_service import get_next_customer_id
 
 
 class CustomerService:
-    def __init__(self, customer_repo, car_repo):
+    def __init__(self, customer_repo: CustomerRepository, car_repo: CarRepository) -> None:
         self.customer_repo = customer_repo
         self.car_repo = car_repo
 
-    def add_customer(self, customer_id, name, phone, email, address):
-        customer_id = safe_str(customer_id).upper()
-        name = smart_capitalize(name)
-        address = smart_capitalize(address)
+    def list_all(self) -> list[Customer]:
+        return self.customer_repo.list_all()
 
-        if not name:
-            raise ValueError("Bitte mindestens den Kundennamen eingeben.")
+    def get_by_id(self, customer_id: str) -> Optional[Customer]:
+        return self.customer_repo.get_by_id(safe_str(customer_id))
 
-        if self.customer_repo.get_by_id(customer_id):
-            raise ValueError(f"Die Kunden-ID '{customer_id}' existiert bereits.")
+    def get_next_id(self) -> str:
+        return get_next_customer_id(self.customer_repo)
 
-        customer = Customer(
-            id=customer_id,
+    def get_customer_choices(self, include_empty: bool = True) -> list[str]:
+        choices: list[str] = []
+        if include_empty:
+            choices.append("-")
+
+        for customer in self.customer_repo.list_all():
+            choices.append(f"{customer.id} | {customer.name}")
+
+        return choices
+
+    def extract_customer_id(self, choice: str) -> str:
+        value = safe_str(choice)
+        if not value or value == "-":
+            return ""
+        return value.split("|")[0].strip()
+
+    def get_customer_name_by_id(self, customer_id: str) -> str:
+        customer = self.customer_repo.get_by_id(safe_str(customer_id))
+        return customer.name if customer else "-"
+
+    def create(
+        self,
+        customer_id: str,
+        name: str,
+        phone: str,
+        email: str,
+        address: str,
+    ) -> Customer:
+        normalized_id = safe_str(customer_id).upper() or self.get_next_id()
+
+        if self.customer_repo.exists(normalized_id):
+            raise ValueError(f"Die Kunden-ID '{normalized_id}' existiert bereits.")
+
+        customer = self._build_customer(
+            customer_id=normalized_id,
             name=name,
-            phone=safe_str(phone),
-            email=safe_str(email),
+            phone=phone,
+            email=email,
             address=address,
         )
         self.customer_repo.add(customer)
         return customer
 
-    def get_customer(self, customer_id: str):
-        return self.customer_repo.get_by_id(customer_id)
+    def update(
+        self,
+        selected_id: str,
+        name: str,
+        phone: str,
+        email: str,
+        address: str,
+    ) -> Customer:
+        normalized_selected_id = safe_str(selected_id)
+        if not normalized_selected_id:
+            raise ValueError("Bitte zuerst einen Kunden zum Bearbeiten auswählen.")
 
-    def update_customer(self, selected_id, name, phone, email, address):
-        customer = self.customer_repo.get_by_id(selected_id)
-        if not customer:
+        existing = self.customer_repo.get_by_id(normalized_selected_id)
+        if existing is None:
             raise ValueError("Kunde nicht gefunden.")
 
-        name = smart_capitalize(name)
-        address = smart_capitalize(address)
+        updated = self._build_customer(
+            customer_id=existing.id,
+            name=name,
+            phone=phone,
+            email=email,
+            address=address,
+        )
+        self.customer_repo.update(updated)
+        return updated
 
-        if not name:
-            raise ValueError("Bitte mindestens den Kundennamen eingeben.")
+    def delete(self, selected_id: str) -> Customer:
+        normalized_selected_id = safe_str(selected_id)
+        if not normalized_selected_id:
+            raise ValueError("Bitte zuerst einen Kunden auswählen.")
 
-        customer.name = name
-        customer.phone = safe_str(phone)
-        customer.email = safe_str(email)
-        customer.address = address
-
-        self.customer_repo.update(customer)
-        return customer
-
-    def delete_customer(self, selected_id: str):
-        customer = self.customer_repo.get_by_id(selected_id)
-        if not customer:
+        existing = self.customer_repo.get_by_id(normalized_selected_id)
+        if existing is None:
             raise ValueError("Kunde nicht gefunden.")
 
-        used_by_car = next((car for car in self.car_repo.list_all() if car.customer_id == selected_id), None)
-        if used_by_car:
+        used_by_car = next(
+            (car for car in self.car_repo.list_all() if car.customer_id == normalized_selected_id),
+            None,
+        )
+        if used_by_car is not None:
             raise ValueError(
-                f"Kunde '{selected_id}' ist noch mit Fahrzeug '{used_by_car.id}' verknüpft und kann nicht gelöscht werden."
+                f"Kunde '{normalized_selected_id}' ist noch mit Fahrzeug '{used_by_car.id}' verknüpft und kann nicht gelöscht werden."
             )
 
-        self.customer_repo.delete(selected_id)
-        return customer
+        self.customer_repo.delete(normalized_selected_id)
+        return existing
 
-    def list_all(self):
-        return self.customer_repo.list_all()
+    def filter(self, search_term: str = "") -> list[Customer]:
+        customers = self.customer_repo.list_all()
+        term = safe_str(search_term).lower()
+
+        if term:
+            customers = [
+                customer for customer in customers
+                if term in customer.id.lower()
+                or term in customer.name.lower()
+                or term in customer.phone.lower()
+                or term in customer.email.lower()
+                or term in customer.address.lower()
+            ]
+
+        return customers
+
+    def _build_customer(
+        self,
+        customer_id: str,
+        name: str,
+        phone: str,
+        email: str,
+        address: str,
+    ) -> Customer:
+        normalized_name = smart_capitalize(name)
+        normalized_address = smart_capitalize(address)
+
+        if not normalized_name:
+            raise ValueError("Bitte mindestens den Kundennamen eingeben.")
+
+        return Customer(
+            id=customer_id,
+            name=normalized_name,
+            phone=safe_str(phone),
+            email=safe_str(email),
+            address=normalized_address,
+        )

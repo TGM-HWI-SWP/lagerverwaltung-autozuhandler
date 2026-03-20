@@ -1,28 +1,48 @@
-from typing import Protocol, Optional
-from src.domain.models.car import Car
-from src.domain.models.part import Part
-from src.domain.models.customer import Customer
- 
- 
-class CarRepository(Protocol):
-    def add(self, car: Car) -> None: ...
-    def get_by_id(self, car_id: str) -> Optional[Car]: ...
-    def list_all(self) -> list[Car]: ...
-    def update(self, car: Car) -> None: ...
-    def delete(self, car_id: str) -> None: ...
- 
- 
-class PartRepository(Protocol):
-    def add(self, part: Part) -> None: ...
-    def get_by_id(self, part_id: str) -> Optional[Part]: ...
-    def list_all(self) -> list[Part]: ...
-    def update(self, part: Part) -> None: ...
-    def delete(self, part_id: str) -> None: ...
- 
- 
-class CustomerRepository(Protocol):
-    def add(self, customer: Customer) -> None: ...
-    def get_by_id(self, customer_id: str) -> Optional[Customer]: ...
-    def list_all(self) -> list[Customer]: ...
-    def update(self, customer: Customer) -> None: ...
-    def delete(self, customer_id: str) -> None: ...
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from typing import Generic, Optional, TypeVar
+
+from domain.models.car import Car
+from domain.models.part import Part
+from domain.models.customer import Customer
+
+T = TypeVar("T")
+
+
+class Repository(ABC, Generic[T]):
+    @abstractmethod
+    def list_all(self) -> list[T]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_by_id(self, entity_id: str) -> Optional[T]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def exists(self, entity_id: str) -> bool:
+        raise NotImplementedError
+
+    @abstractmethod
+    def add(self, entity: T) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def update(self, entity: T) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def delete(self, entity_id: str) -> None:
+        raise NotImplementedError
+
+
+class CarRepository(Repository[Car], ABC):
+    pass
+
+
+class PartRepository(Repository[Part], ABC):
+    pass
+
+
+class CustomerRepository(Repository[Customer], ABC):
+    pass

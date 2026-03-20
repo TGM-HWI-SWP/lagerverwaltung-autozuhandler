@@ -1,286 +1,125 @@
-import gradio as gr
- 
-from src.domain.enums import DEFAULT_BRANDS, DEFAULT_CATEGORIES
+from __future__ import annotations
 
-from src.services.formatting_service import normalize_db_list, safe_str
+import matplotlib.pyplot as plt
 
-from src.app_context import (
+from domain.enums import CarStatus, PartStatus
+from domain.models.car import Car
+from domain.models.customer import Customer
+from domain.models.part import Part
 
-    car_service, part_service, customer_service,
 
-    dashboard_service, car_report, part_report, customer_report,
-
-    next_car_id, next_part_id, next_customer_id, get_customer_name_by_id
-
-)
-
-from src.ui.charts import get_car_chart, get_part_chart, get_customer_chart
- 
- 
-def get_brand_choices():
-
-    values = DEFAULT_BRANDS + [car.brand for car in car_service.list_all() if car.brand]
-
-    return normalize_db_list(values)
- 
- 
-def get_category_choices():
-
-    values = DEFAULT_CATEGORIES + [part.category for part in part_service.list_all() if part.category]
-
-    return normalize_db_list(values)
- 
- 
-def make_choice_suggestions(search_text, source_list):
-
-    text = safe_str(search_text).lower()
-
-    if not text:
-
-        result = source_list[:8]
-
-    else:
-
-        starts = [v for v in source_list if v.lower().startswith(text)]
-
-        contains = [v for v in source_list if text in v.lower() and v not in starts]
-
-        result = (starts + contains)[:8]
-
-    return gr.update(choices=result, value=None)
- 
- 
-def suggest_brand_choices(search_text):
-
-    return make_choice_suggestions(search_text, get_brand_choices())
- 
- 
-def suggest_category_choices(search_text):
-
-    return make_choice_suggestions(search_text, get_category_choices())
- 
- 
-def pick_dropdown_value(value):
-
-    return value or ""
- 
- 
-def get_customer_choices(include_empty: bool = True):
-
-    choices = []
-
-    if include_empty:
-
-        choices.append("-")
-
-    for customer in customer_service.list_all():
-
-        choices.append(f"{customer.id} | {customer.name}")
-
-    return choices
- 
- 
-def extract_customer_id(choice: str) -> str:
-
-    value = safe_str(choice)
-
-    if not value or value == "-":
-
-        return ""
-
-    return value.split("|")[0].strip()
- 
- 
-def get_car_id_choices():
-
-    return [car.id for car in car_service.list_all()]
- 
- 
-def get_part_id_choices():
-
-    return [part.id for part in part_service.list_all()]
- 
- 
-def get_customer_id_choices():
-
-    return [customer.id for customer in customer_service.list_all()]
- 
- 
-def clear_car_form():
-
-    return (
-
-        next_car_id(),
-
-        "",
-
-        "",
-
-        None,
-
-        "",
-
-        "",
-
-        "",
-
-        "",
-
-        "",
-
-        "-",
-
-        "Offen",
-
-        None,
-
+def get_empty_figure(title: str):
+    fig, ax = plt.subplots(figsize=(8, 4.0))
+    fig.patch.set_facecolor("#071224")
+    ax.set_facecolor("#071224")
+    ax.text(
+        0.5,
+        0.5,
+        "Noch keine Daten vorhanden",
+        ha="center",
+        va="center",
+        fontsize=14,
+        color="#cbd5e1",
     )
- 
- 
-def clear_part_form():
+    ax.set_title(title, color="white", fontsize=14, pad=16)
+    ax.axis("off")
+    plt.tight_layout()
+    return fig
 
-    return next_part_id(), "", "", "", "", "", None
- 
- 
-def clear_customer_form():
 
-    return next_customer_id(), "", "", "", ""
- 
- 
-def refresh_car_view(filtered_data=None, status_message=""):
+def _style_axes(ax, title: str) -> None:
+    ax.set_title(title, color="white", fontsize=14, pad=16)
+    ax.tick_params(axis="x", colors="white")
+    ax.tick_params(axis="y", colors="white")
+    ax.spines["bottom"].set_color("#64748b")
+    ax.spines["left"].set_color("#64748b")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.grid(axis="y", linestyle="--", alpha=0.25)
 
-    data = filtered_data if filtered_data is not None else car_service.list_all()
 
-    report_text = car_report.build_text(data) if data else "Keine passenden Fahrzeuge gefunden."
+def _apply_dark_background(fig, ax) -> None:
+    fig.patch.set_facecolor("#071224")
+    ax.set_facecolor("#071224")
 
-    return (
 
-        status_message,
+def _annotate_bars(ax, bars, values: list[int]) -> None:
+    offset = 0.03 if max(values, default=0) <= 5 else max(values) * 0.01
+    for bar, value in zip(bars, values):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            value + offset,
+            str(value),
+            ha="center",
+            va="bottom",
+            color="white",
+        )
 
-        dashboard_service.cars_to_dataframe(data),
 
-        report_text,
+def get_car_chart(cars: list[Car]):
+    counts = {
+        CarStatus.AVAILABLE.value: 0,
+        CarStatus.RESERVED.value: 0,
+        CarStatus.SOLD.value: 0,
+    }
 
-        *dashboard_service.get_car_dashboard_cards(data),
+    for car in cars:
+        counts[car.status.value] = counts.get(car.status.value, 0) + 1
 
-        get_car_chart(data),
+    if sum(counts.values()) == 0:
+        return get_empty_figure("Fahrzeuge pro Status")
 
-        gr.update(choices=["Alle"] + get_brand_choices(), value="Alle"),
+    labels = list(counts.keys())
+    values = list(counts.values())
 
-        gr.update(choices=get_car_id_choices(), value=None),
+    fig, ax = plt.subplots(figsize=(8, 4.0))
+    _apply_dark_background(fig, ax)
+    bars = ax.bar(labels, values, edgecolor="white", linewidth=1)
+    _style_axes(ax, "Fahrzeuge pro Status")
+    _annotate_bars(ax, bars, values)
+    plt.tight_layout()
+    return fig
 
-        gr.update(choices=get_customer_choices(), value="-"),
 
-        next_car_id(),
+def get_part_chart(parts: list[Part]):
+    counts = {
+        PartStatus.AVAILABLE.value: 0,
+        PartStatus.REORDER.value: 0,
+        PartStatus.UNAVAILABLE.value: 0,
+    }
 
-    )
- 
- 
-def refresh_part_view(filtered_data=None, status_message=""):
+    for part in parts:
+        counts[part.status.value] = counts.get(part.status.value, 0) + part.stock
 
-    data = filtered_data if filtered_data is not None else part_service.list_all()
+    if sum(counts.values()) == 0:
+        return get_empty_figure("Teilebestand nach Status")
 
-    report_text = part_report.build_text(data) if data else "Keine passenden Teile gefunden."
+    labels = list(counts.keys())
+    values = list(counts.values())
 
-    return (
+    fig, ax = plt.subplots(figsize=(8, 4.0))
+    _apply_dark_background(fig, ax)
+    bars = ax.bar(labels, values, edgecolor="white", linewidth=1)
+    _style_axes(ax, "Teilebestand nach Status")
+    _annotate_bars(ax, bars, values)
+    plt.tight_layout()
+    return fig
 
-        status_message,
 
-        dashboard_service.parts_to_dataframe(data),
+def get_customer_chart(customers: list[Customer]):
+    if not customers:
+        return get_empty_figure("Kundenkontakte")
 
-        report_text,
+    labels = ["Mit E-Mail", "Mit Telefon", "Ohne Kontakt"]
+    with_email = sum(1 for c in customers if c.email.strip())
+    with_phone = sum(1 for c in customers if c.phone.strip())
+    without_contact = sum(1 for c in customers if not c.email.strip() and not c.phone.strip())
+    values = [with_email, with_phone, without_contact]
 
-        *dashboard_service.get_part_dashboard_cards(data),
-
-        get_part_chart(data),
-
-        gr.update(choices=["Alle"] + get_category_choices(), value="Alle"),
-
-        gr.update(choices=get_part_id_choices(), value=None),
-
-        next_part_id(),
-
-    )
- 
- 
-def refresh_customer_view(filtered_data=None, status_message=""):
-
-    data = filtered_data if filtered_data is not None else customer_service.list_all()
-
-    report_text = customer_report.build_text(data) if data else "Keine passenden Kunden gefunden."
-
-    return (
-
-        status_message,
-
-        dashboard_service.customers_to_dataframe(data),
-
-        report_text,
-
-        *dashboard_service.get_customer_dashboard_cards(data),
-
-        get_customer_chart(data),
-
-        gr.update(choices=get_customer_id_choices(), value=None),
-
-        gr.update(choices=get_customer_choices(), value="-"),
-
-        next_customer_id(),
-
-    )
- 
- 
-def initial_load():
-
-    car_data = car_service.list_all()
-
-    part_data = part_service.list_all()
-
-    customer_data = customer_service.list_all()
- 
-    return (
-
-        *dashboard_service.get_car_dashboard_cards(car_data),
-
-        dashboard_service.cars_to_dataframe(car_data),
-
-        car_report.build_text(car_data),
-
-        get_car_chart(car_data),
-
-        gr.update(choices=["Alle"] + get_brand_choices(), value="Alle"),
-
-        gr.update(choices=get_car_id_choices(), value=None),
-
-        gr.update(choices=get_customer_choices(), value="-"),
-
-        next_car_id(),
- 
-        *dashboard_service.get_part_dashboard_cards(part_data),
-
-        dashboard_service.parts_to_dataframe(part_data),
-
-        part_report.build_text(part_data),
-
-        get_part_chart(part_data),
-
-        gr.update(choices=["Alle"] + get_category_choices(), value="Alle"),
-
-        gr.update(choices=get_part_id_choices(), value=None),
-
-        next_part_id(),
- 
-        *dashboard_service.get_customer_dashboard_cards(customer_data),
-
-        dashboard_service.customers_to_dataframe(customer_data),
-
-        customer_report.build_text(customer_data),
-
-        get_customer_chart(customer_data),
-
-        gr.update(choices=get_customer_id_choices(), value=None),
-
-        next_customer_id(),
-
-    )
- 
+    fig, ax = plt.subplots(figsize=(8, 4.0))
+    _apply_dark_background(fig, ax)
+    bars = ax.bar(labels, values, edgecolor="white", linewidth=1)
+    _style_axes(ax, "Kundenkontakte")
+    _annotate_bars(ax, bars, values)
+    plt.tight_layout()
+    return fig
