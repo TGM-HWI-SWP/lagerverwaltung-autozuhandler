@@ -1,25 +1,27 @@
-# Changelog - [Name]
+# Changelog - [Ben Hamza]
 
-Persönliches Changelog für [Name], Rolle: [Rollenbezeichnung]
+Persönliches Changelog für [Ben Hamza], Rolle: [Rolle 1 Contract Owner]
 
 ---
 
 ## [v0.1] - 2025-01-20
 
 ### Implementiert
-- [Feature/Fix 1]
-- [Feature/Fix 2]
-- [Feature/Fix 3]
+- [Projektstart und Rollenverteilung]
+- [Projektstruktur im Repository überprüft und organisiert]
+- [Erste Schnittstellen (Contracts) definiert]
 
 ### Tests geschrieben
 - test_[name 1]
 - test_[name 2]
 
+noch keine
+
 ### Commits
 ```
-- abc1234 Feat: [Beschreibung]
-- def5678 Test: [Beschreibung]
-- ghi9012 Docs: [Beschreibung]
+- abc1234 Feat: [Ordnerstruktur und Schnittstellenvorgabe]
+- def5678 Test: [Bearbeitung der Ordnerstruktur und Schnittstellenvorgabe]
+- ghi9012 Docs: [app_context]
 ```
 
 ### Mergekonflikt(e)
