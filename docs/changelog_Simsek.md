@@ -1,29 +1,31 @@
-# Changelog - [Name]
+# Changelog - [Simsek]
 
-Persönliches Changelog für [Name], Rolle: [Rollenbezeichnung]
+Persönliches Changelog für [Simsek], Rolle: [Rolle_2_Businesslogik_&_Report_A]
 
 ---
 
-## [v0.1] - 2025-01-20
+## [v0.1] - 2026-03-06
 
 ### Implementiert
-- [Feature/Fix 1]
-- [Feature/Fix 2]
-- [Feature/Fix 3]
+- [Projektstart und Rollenverteilung]
+- [Grundstruktur der Businesslogik erstellt]
+- [Erste Codes für Produkt/Artikel implementiert]
 
 ### Tests geschrieben
 - test_[name 1]
 - test_[name 2]
 
+erstmal noch keine Tests geschrieben
+
 ### Commits
 ```
-- abc1234 Feat: [Beschreibung]
-- def5678 Test: [Beschreibung]
-- ghi9012 Docs: [Beschreibung]
+- abc1234 Feat: [Ersten Vorgaben und Logiken]
+- def5678 Test: [Report A / Businesslogik]
+- ghi9012 Docs: [Services grundlegend festgelegt]
 ```
 
 ### Mergekonflikt(e)
-- [Datei]: [Kurzbeschreibung und Lösung]
+- [Datei]: [Keine]
 
 ---
 
