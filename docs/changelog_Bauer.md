@@ -1,25 +1,27 @@
-# Changelog - [Name]
+# Changelog - [Fabienne]
 
-Persönliches Changelog für [Name], Rolle: [Rollenbezeichnung]
+Persönliches Changelog für [Fabienne], Rolle: [Report B & Qualität]
 
 ---
 
-## [v0.1] - 2025-01-20
+## [v0.1] - 2026-04-17
 
 ### Implementiert
-- [Feature/Fix 1]
-- [Feature/Fix 2]
-- [Feature/Fix 3]
+- [Projektstart & Rollenverteilung]
+- [Projektmanagement ]
+- [Report B & Statistik der Lagerverlauf (Nextcloud)]
 
 ### Tests geschrieben
 - test_[name 1]
 - test_[name 2]
 
+
+
 ### Commits
 ```
-- abc1234 Feat: [Beschreibung]
-- def5678 Test: [Beschreibung]
-- ghi9012 Docs: [Beschreibung]
+- abc1234 Feat: [Admins geändert]
+- def5678 Test: [Login Daten geändert]
+- ghi9012 Docs: [Auswahlkategorien & changelogs]
 ```
 
 ### Mergekonflikt(e)
@@ -128,5 +130,5 @@ Persönliches Changelog für [Name], Rolle: [Rollenbezeichnung]
 
 ---
 
-**Changelog erstellt von:** [Name]  
-**Letzte Aktualisierung:** [Datum]
+**Changelog erstellt von:** [Fabienne]  
+**Letzte Aktualisierung:** [17.04.2026]
