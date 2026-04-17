@@ -96,17 +96,19 @@ erstmal noch keine Tests geschrieben
 
 ### Implementiert
 - [Changelog fast komplett fertig gestellt]
+- [Mergekonflikt behoben]
 
 ### Tests geschrieben
 - Keine
 
 ### Commits
 ```
-- [Commits]
+- 59d83dbd12487658b3bcf0115307aa71cc49dd5a Feat: Changelog weiter bearbeitet
+- 959470ebd801396294ba5201c75b389d0f53d987 Feat: Konfliktbehebung
 ```
 
 ### Mergekonflikt(e)
-- [Konflikte]
+- Änderung des Codes durch eines anderen Gruppenmitgliedes erfolgte gleichzeitig mit meiner Änderung => Zuerst pullen dann doch zuerst commit und push dann war es already up to date.
 
 ---
 
