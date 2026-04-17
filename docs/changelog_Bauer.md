@@ -4,12 +4,12 @@ Persönliches Changelog für [Fabienne], Rolle: [Report B & Qualität]
 
 ---
 
-## [v0.1] - 2026-04-17
+## [v0.1] - 13.03.2026
 
 ### Implementiert
 - [Projektstart & Rollenverteilung]
 - [Projektmanagement ]
-- [Report B & Statistik der Lagerverlauf (Nextcloud)]
+
 
 ### Tests geschrieben
 - test_[name 1]
@@ -29,10 +29,10 @@ Persönliches Changelog für [Fabienne], Rolle: [Report B & Qualität]
 
 ---
 
-## [v0.2] - [Datum]
+## [v0.2] - [20.03.2026]
 
 ### Implementiert
-- [Feature/Fix 1]
+- [Architektur, Walking Skeleton, GUI-Entwurf (Grafik, etc) ]
 - [Feature/Fix 2]
 
 ### Tests geschrieben
@@ -48,10 +48,10 @@ Persönliches Changelog für [Fabienne], Rolle: [Report B & Qualität]
 
 ---
 
-## [v0.3] - [Datum]
+## [v0.3] - [27.03.2026]
 
 ### Implementiert
-- [Feature/Fix 1]
+- [Kernlogik & GUI-Minimum]
 
 ### Tests geschrieben
 - [Tests]
@@ -66,10 +66,10 @@ Persönliches Changelog für [Fabienne], Rolle: [Report B & Qualität]
 
 ---
 
-## [v0.4] - [Datum]
+## [v0.4] - [10.04.2026]
 
 ### Implementiert
-- [Feature/Fix]
+- [ erste Reports ]
 
 ### Tests geschrieben
 - [Tests]
@@ -84,10 +84,10 @@ Persönliches Changelog für [Fabienne], Rolle: [Report B & Qualität]
 
 ---
 
-## [v0.5] - [Datum]
+## [v0.5] - [17.04.2026]
 
 ### Implementiert
-- [Feature/Fix]
+- [Tests & Stabilisierung ]
 
 ### Tests geschrieben
 - [Tests]
@@ -102,10 +102,10 @@ Persönliches Changelog für [Fabienne], Rolle: [Report B & Qualität]
 
 ---
 
-## [v1.0] - [Datum]
+## [v1.0] - [24.04.2026]
 
 ### Implementiert
-- [Feature/Fix]
+- [Fertige, stabile Version ]
 
 ### Tests geschrieben
 - [Tests]
