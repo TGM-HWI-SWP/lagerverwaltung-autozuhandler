@@ -75,7 +75,7 @@ Persönliches Changelog für [Ben Hamza], Rolle: [Rolle 1 Contract Owner]
 
 ### Commits
 ```
-- [Commits]
+- 4a853bda0a33358aaebedeb9586095d25b82de2e Feat: [Changelog Ben Hamza fertig]
 ```
 
 ### Mergekonflikt(e)
@@ -121,13 +121,13 @@ Persönliches Changelog für [Ben Hamza], Rolle: [Rolle 1 Contract Owner]
 
 ## Zusammenfassung
 
-**Gesamt implementierte Features:** [Anzahl]  
-**Gesamt geschriebene Tests:** [Anzahl]  
-**Gesamt Commits:** [Anzahl]  
-**Größte Herausforderung:** [Beschreibung]  
-**Schönste Code-Zeile:** [Code-Snippet]
+**Gesamt implementierte Features:** [6]  
+**Gesamt geschriebene Tests:** [0]  
+**Gesamt Commits:** [9]  
+**Größte Herausforderung:** [Dafür zu sorgen, dass GUI und Businesslogik gut zusammenarbeiten und Mergekonflikte im Team zu lösen]  
+**Schönste Code-Zeile:** [NEXTCLOUD_EXPORT_DIR = r"C:\Nextcloud_Autozu\exports"]
 
 ---
 
-**Changelog erstellt von:** [Name]  
-**Letzte Aktualisierung:** [Datum]
+**Changelog erstellt von:** [Sirin Ben Hamza]  
+**Letzte Aktualisierung:** [24.04.2026]
