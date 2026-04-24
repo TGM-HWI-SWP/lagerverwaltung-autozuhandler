@@ -61,3 +61,14 @@ class CustomerRepositoryPort(Protocol):
 
     def exists(self, customer_id: str) -> bool:
         ...
+
+
+class MovementRepositoryPort(Protocol):
+    def add(self, movement: dict) -> None:
+        ...
+
+    def get_all(self) -> list[dict]:
+        ...
+
+    def clear(self) -> None:
+        ...

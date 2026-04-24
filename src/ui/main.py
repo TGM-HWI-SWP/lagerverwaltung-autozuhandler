@@ -4,11 +4,12 @@ import gradio as gr
 
 from src.app_context import APP_TITLE, AppContext
 from src.services.car_service import CAR_STATUSES, FUELS, INVOICE_STATUSES
-from src.services.formatting_service import safe_str, smart_capitalize
+from src.services.formatting_service import smart_capitalize
 from src.services.part_service import PART_STATUSES
 from src.ui.charts import (
     get_car_status_chart,
     get_customer_chart,
+    get_movement_action_chart,
     get_part_status_chart,
     get_profit_trend_chart,
 )
@@ -35,6 +36,9 @@ def create_ui(app: AppContext) -> gr.Blocks:
     def customer_df(data: list[dict] | None = None):
         return app.customer_report_service.generate_dataframe(data)
 
+    def movement_df(data: list[dict] | None = None):
+        return app.movement_report_service.generate_dataframe(data)
+
     def car_report_text(data: list[dict] | None = None) -> str:
         return app.car_report_service.generate_text_report(data)
 
@@ -47,6 +51,9 @@ def create_ui(app: AppContext) -> gr.Blocks:
     def inventory_report_text(data: list[dict] | None = None) -> str:
         return app.inventory_report_service.generate_text_report(data)
 
+    def movement_report_text(data: list[dict] | None = None) -> str:
+        return app.movement_report_service.generate_text_report(data)
+
     def get_car_cards(data: list[dict] | None = None):
         stats = app.car_report_service.get_stats(data)
         return app.dashboard_service.get_car_dashboard_cards(*stats)
@@ -58,6 +65,10 @@ def create_ui(app: AppContext) -> gr.Blocks:
     def get_customer_cards(data: list[dict] | None = None):
         stats = app.customer_report_service.get_stats(data)
         return app.dashboard_service.get_customer_dashboard_cards(*stats)
+
+    def get_movement_cards(data: list[dict] | None = None):
+        stats = app.movement_report_service.get_stats(data)
+        return app.dashboard_service.get_movement_dashboard_cards(*stats)
 
     def clear_car_form():
         return (
@@ -139,6 +150,18 @@ def create_ui(app: AppContext) -> gr.Blocks:
             app.customer_service.get_next_id(),
         )
 
+    def refresh_movement_full(data: list[dict] | None = None, message: str = ""):
+        source = data if data is not None else app.movement_service.get_all()
+        return (
+            message,
+            movement_df(source),
+            movement_report_text(source) if source else "Keine Bewegungen vorhanden.",
+            *get_movement_cards(source),
+            get_movement_action_chart(source),
+            gr.update(choices=["Alle"] + app.movement_service.get_entity_choices(), value="Alle"),
+            gr.update(choices=["Alle"] + app.movement_service.get_action_choices(), value="Alle"),
+        )
+
     def initial_load():
         return (
             *get_car_cards(),
@@ -166,6 +189,13 @@ def create_ui(app: AppContext) -> gr.Blocks:
             get_customer_chart(),
             gr.update(choices=get_customer_id_choices(app.customer_service.get_all()), value=None),
             app.customer_service.get_next_id(),
+
+            *get_movement_cards(),
+            movement_df(),
+            movement_report_text(),
+            get_movement_action_chart(),
+            gr.update(choices=["Alle"] + app.movement_service.get_entity_choices(), value="Alle"),
+            gr.update(choices=["Alle"] + app.movement_service.get_action_choices(), value="Alle"),
         )
 
     def login_user(username: str, password: str):
@@ -525,6 +555,35 @@ def create_ui(app: AppContext) -> gr.Blocks:
     def export_customers_excel():
         return app.exporter.export_excel(app.customer_report_service.generate_dataframe(), "kunden")
 
+    def filter_movements(search_term: str, entity_filter: str, action_filter: str):
+        filtered = app.movement_service.filter_movements(search_term, entity_filter, action_filter)
+        return (
+            movement_df(filtered),
+            movement_report_text(filtered) if filtered else "Keine Bewegungen vorhanden.",
+            *get_movement_cards(filtered),
+            get_movement_action_chart(filtered),
+        )
+
+    def reset_movements():
+        return (
+            "",
+            "Alle",
+            "Alle",
+            movement_df(),
+            movement_report_text(),
+            *get_movement_cards(),
+            get_movement_action_chart(),
+        )
+
+    def export_movements_txt():
+        return app.exporter.export_text("movement_report", app.movement_report_service.generate_text_report())
+
+    def export_movements_csv():
+        return app.exporter.export_csv(app.movement_report_service.generate_dataframe(), "movements")
+
+    def export_movements_excel():
+        return app.exporter.export_excel(app.movement_report_service.generate_dataframe(), "movements")
+
     def suggest_brand_choices(search_text: str):
         return gr.update(choices=make_choice_suggestions(search_text, get_brand_choices(app.car_service.get_all())), value=None)
 
@@ -570,7 +629,7 @@ def create_ui(app: AppContext) -> gr.Blocks:
                 """
                 <div class="main-title">
                     <h1>Autozuhändler</h1>
-                    <p>Verwaltung von Fahrzeugen, Teilen, Kunden, Rechnungsstatus, Reports und Exporten.</p>
+                    <p>Verwaltung von Fahrzeugen, Teilen, Kunden, Rechnungsstatus, Reports, Movements und Exporten.</p>
                 </div>
                 """
             )
@@ -770,6 +829,41 @@ def create_ui(app: AppContext) -> gr.Blocks:
                     customer_export_xlsx_btn = gr.Button("Excel exportieren", elem_classes=["secondary-btn"])
                 customer_export_status = gr.Textbox(label="Exportstatus", interactive=False)
 
+            with gr.Tab("Movements / Report B"):
+                with gr.Row():
+                    movement_kpi_1 = gr.HTML()
+                    movement_kpi_2 = gr.HTML()
+                    movement_kpi_3 = gr.HTML()
+                    movement_kpi_4 = gr.HTML()
+
+                with gr.Row():
+                    with gr.Column(scale=2):
+                        gr.HTML('<div class="section-title">📈 Bewegungen</div><div class="subtle-text">Alle Systembewegungen aus Fahrzeugen, Teilen und Kunden. Ideal als Report B.</div>')
+                        movement_table = gr.Dataframe(interactive=False, label="Movement-Tabelle")
+
+                with gr.Row():
+                    movement_search = gr.Textbox(label="🔎 Suche", placeholder="Typ, Objekt-ID, Aktion, Beschreibung")
+                    movement_entity_filter = gr.Dropdown(label="🏷️ Typ filtern", choices=["Alle"], value="Alle", filterable=True)
+                    movement_action_filter = gr.Dropdown(label="📌 Aktion filtern", choices=["Alle"], value="Alle", filterable=True)
+
+                with gr.Row():
+                    movement_filter_btn = gr.Button("Filter anwenden", elem_classes=["secondary-btn"])
+                    movement_reset_btn = gr.Button("Ansicht zurücksetzen", elem_classes=["secondary-btn"])
+
+                with gr.Row():
+                    with gr.Column(scale=1):
+                        gr.HTML('<div class="section-title">🧾 Movement-Report</div>')
+                        movement_report = gr.Textbox(label="Report B", lines=18, interactive=False, elem_classes=["report-box"])
+                    with gr.Column(scale=1):
+                        gr.HTML('<div class="section-title">📊 Bewegungsdiagramm</div>')
+                        movement_chart = gr.Plot(label="Bewegungen nach Aktion")
+
+                with gr.Row():
+                    movement_export_txt_btn = gr.Button("TXT exportieren", elem_classes=["primary-btn"])
+                    movement_export_csv_btn = gr.Button("CSV exportieren", elem_classes=["secondary-btn"])
+                    movement_export_xlsx_btn = gr.Button("Excel exportieren", elem_classes=["secondary-btn"])
+                movement_export_status = gr.Textbox(label="Exportstatus", interactive=False)
+
         demo.load(
             fn=initial_load,
             outputs=[
@@ -781,6 +875,9 @@ def create_ui(app: AppContext) -> gr.Blocks:
 
                 customer_kpi_1, customer_kpi_2, customer_kpi_3,
                 customer_table, customer_report, customer_chart, customer_edit_select, customer_id,
+
+                movement_kpi_1, movement_kpi_2, movement_kpi_3, movement_kpi_4,
+                movement_table, movement_report, movement_chart, movement_entity_filter, movement_action_filter,
             ],
         )
 
@@ -986,5 +1083,21 @@ def create_ui(app: AppContext) -> gr.Blocks:
         customer_export_txt_btn.click(fn=export_customers_txt, outputs=[customer_export_status])
         customer_export_csv_btn.click(fn=export_customers_csv, outputs=[customer_export_status])
         customer_export_xlsx_btn.click(fn=export_customers_excel, outputs=[customer_export_status])
+
+        movement_filter_btn.click(
+            fn=filter_movements,
+            inputs=[movement_search, movement_entity_filter, movement_action_filter],
+            outputs=[movement_table, movement_report, movement_kpi_1, movement_kpi_2, movement_kpi_3, movement_kpi_4, movement_chart],
+        )
+
+        movement_reset_btn.click(
+            fn=reset_movements,
+            inputs=[],
+            outputs=[movement_search, movement_entity_filter, movement_action_filter, movement_table, movement_report, movement_kpi_1, movement_kpi_2, movement_kpi_3, movement_kpi_4, movement_chart],
+        )
+
+        movement_export_txt_btn.click(fn=export_movements_txt, outputs=[movement_export_status])
+        movement_export_csv_btn.click(fn=export_movements_csv, outputs=[movement_export_status])
+        movement_export_xlsx_btn.click(fn=export_movements_excel, outputs=[movement_export_status])
 
     return demo

@@ -5,6 +5,7 @@ from copy import deepcopy
 from src.ports.repositories import (
     CarRepositoryPort,
     CustomerRepositoryPort,
+    MovementRepositoryPort,
     PartRepositoryPort,
 )
 
@@ -112,3 +113,17 @@ class InMemoryCustomerRepository(CustomerRepositoryPort):
 
     def exists(self, customer_id: str) -> bool:
         return any(customer.get("id") == customer_id for customer in self._customers)
+
+
+class InMemoryMovementRepository(MovementRepositoryPort):
+    def __init__(self) -> None:
+        self._movements: list[dict] = []
+
+    def add(self, movement: dict) -> None:
+        self._movements.append(deepcopy(movement))
+
+    def get_all(self) -> list[dict]:
+        return [deepcopy(entry) for entry in reversed(self._movements)]
+
+    def clear(self) -> None:
+        self._movements.clear()

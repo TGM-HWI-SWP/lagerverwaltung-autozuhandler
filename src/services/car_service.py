@@ -1,37 +1,40 @@
 from __future__ import annotations
- 
+
 from datetime import datetime
- 
+
 from src.ports.repositories import CarRepositoryPort, CustomerRepositoryPort
 from src.services.formatting_service import safe_str, smart_capitalize
 from src.services.id_service import get_next_car_id
+from src.services.movement_service import MovementService
 from src.services.service_result import ServiceResult
- 
- 
+
+
 CAR_STATUSES = ["Verfügbar", "Reserviert", "Verkauft"]
 INVOICE_STATUSES = ["Offen", "Bezahlt", "Storniert"]
 FUELS = ["Benzin", "Diesel", "Hybrid", "Elektro"]
- 
- 
+
+
 class CarService:
     def __init__(
         self,
         car_repository: CarRepositoryPort,
         customer_repository: CustomerRepositoryPort,
+        movement_service: MovementService | None = None,
     ) -> None:
         self.car_repository = car_repository
         self.customer_repository = customer_repository
- 
+        self.movement_service = movement_service
+
     def get_all(self) -> list[dict]:
         return self.car_repository.get_all()
- 
+
     def get_by_id(self, car_id: str) -> dict | None:
         return self.car_repository.get_by_id(safe_str(car_id).upper())
- 
+
     def get_next_id(self) -> str:
         existing_ids = [car["id"] for car in self.car_repository.get_all()]
         return get_next_car_id(existing_ids)
- 
+
     def create_car(
         self,
         car_id: str,
@@ -62,18 +65,28 @@ class CarService:
             status=status,
             editing_existing_id=None,
         )
- 
+
         if not prepared.success:
             return prepared
- 
+
         car = prepared.data["car"]
         self.car_repository.add(car)
- 
+
+        if self.movement_service:
+            self.movement_service.log(
+                entity_type="Fahrzeug",
+                entity_id=car["id"],
+                action="Erstellt",
+                description=f"Fahrzeug {car['brand']} {car['model']} angelegt",
+                quantity_delta=0,
+                reference=car["status"],
+            )
+
         return ServiceResult.ok(
             f"Fahrzeug '{car['brand']} {car['model']}' wurde gespeichert.",
             car=car,
         )
- 
+
     def update_car(
         self,
         selected_id: str,
@@ -93,11 +106,13 @@ class CarService:
         selected_id = safe_str(selected_id).upper()
         if not selected_id:
             return ServiceResult.fail("Bitte zuerst ein Fahrzeug zum Bearbeiten auswählen.")
- 
+
         existing = self.car_repository.get_by_id(selected_id)
         if not existing:
             return ServiceResult.fail("Fahrzeug nicht gefunden.")
- 
+
+        old_status = safe_str(existing.get("status"))
+
         prepared = self._validate_and_prepare(
             car_id=car_id or selected_id,
             brand=brand,
@@ -113,39 +128,63 @@ class CarService:
             status=status,
             editing_existing_id=selected_id,
         )
- 
+
         if not prepared.success:
             return prepared
- 
+
         car = prepared.data["car"]
         car["id"] = selected_id
         self.car_repository.update(car)
- 
+
+        if self.movement_service:
+            status_text = ""
+            if old_status != car["status"]:
+                status_text = f" (Status: {old_status} → {car['status']})"
+
+            self.movement_service.log(
+                entity_type="Fahrzeug",
+                entity_id=car["id"],
+                action="Aktualisiert",
+                description=f"Fahrzeug {car['brand']} {car['model']} aktualisiert{status_text}",
+                quantity_delta=0,
+                reference=car["invoice_status"],
+            )
+
         return ServiceResult.ok(
             f"Fahrzeug '{selected_id}' wurde aktualisiert.",
             car=car,
         )
- 
+
     def delete_car(self, selected_id: str) -> ServiceResult:
         selected_id = safe_str(selected_id).upper()
- 
+
         if not selected_id:
             return ServiceResult.fail("Bitte zuerst ein Fahrzeug auswählen.")
- 
+
         existing = self.car_repository.get_by_id(selected_id)
         if not existing:
             return ServiceResult.fail("Fahrzeug nicht gefunden.")
- 
+
         deleted_text = f"{existing['brand']} {existing['model']}"
         deleted = self.car_repository.delete(selected_id)
- 
+
         if not deleted:
             return ServiceResult.fail("Fahrzeug konnte nicht gelöscht werden.")
- 
+
+        if self.movement_service:
+            self.movement_service.log(
+                entity_type="Fahrzeug",
+                entity_id=selected_id,
+                action="Gelöscht",
+                description=f"Fahrzeug {deleted_text} gelöscht",
+                quantity_delta=0,
+                reference=existing.get("status", ""),
+            )
+
         return ServiceResult.ok(
             f"Fahrzeug '{selected_id}' ({deleted_text}) wurde gelöscht."
         )
- 
+
     def filter_cars(
         self,
         search_term: object = "",
@@ -153,11 +192,11 @@ class CarService:
         status_filter: object = "Alle",
     ) -> list[dict]:
         filtered = self.car_repository.get_all()
- 
+
         term = safe_str(search_term).lower()
         brand_filter = safe_str(brand_filter)
         status_filter = safe_str(status_filter)
- 
+
         if term:
             filtered = [
                 car
@@ -170,25 +209,25 @@ class CarService:
                 or term in safe_str(car.get("status")).lower()
                 or term in self.get_customer_name_by_id(car.get("customer_id", "")).lower()
             ]
- 
+
         if brand_filter and brand_filter != "Alle":
             filtered = [car for car in filtered if safe_str(car.get("brand")) == brand_filter]
- 
+
         if status_filter and status_filter != "Alle":
             filtered = [car for car in filtered if safe_str(car.get("status")) == status_filter]
- 
+
         return filtered
- 
+
     def get_customer_name_by_id(self, customer_id: object) -> str:
         customer_id = safe_str(customer_id).upper()
         if not customer_id:
             return "-"
- 
+
         customer = self.customer_repository.get_by_id(customer_id)
         if not customer:
             return "-"
         return safe_str(customer.get("name")) or "-"
- 
+
     def _validate_and_prepare(
         self,
         car_id: object,
@@ -213,7 +252,7 @@ class CarService:
         prepared_customer_id = safe_str(customer_id).upper()
         prepared_invoice_status = safe_str(invoice_status)
         prepared_status = safe_str(status)
- 
+
         if not all([
             prepared_brand,
             prepared_model,
@@ -227,16 +266,16 @@ class CarService:
             prepared_status,
         ]):
             return ServiceResult.fail("Bitte alle Pflichtfelder ausfüllen.")
- 
+
         if prepared_fuel not in FUELS:
             return ServiceResult.fail("Ungültiger Kraftstoff.")
- 
+
         if prepared_invoice_status not in INVOICE_STATUSES:
             return ServiceResult.fail("Ungültiger Rechnungsstatus.")
- 
+
         if prepared_status not in CAR_STATUSES:
             return ServiceResult.fail("Ungültiger Fahrzeugstatus.")
- 
+
         try:
             prepared_year = int(year)
             prepared_mileage = int(mileage)
@@ -246,24 +285,24 @@ class CarService:
             return ServiceResult.fail(
                 "Baujahr und Kilometerstand müssen ganze Zahlen sein. Preise müssen Zahlen sein."
             )
- 
+
         if prepared_year < 1900:
             return ServiceResult.fail("Baujahr muss mindestens 1900 sein.")
- 
+
         if prepared_mileage < 0:
             return ServiceResult.fail("Kilometerstand darf nicht negativ sein.")
- 
+
         if prepared_purchase_price < 0 or prepared_sale_price < 0:
             return ServiceResult.fail("Preise dürfen nicht negativ sein.")
- 
+
         if editing_existing_id is None and self.car_repository.exists(prepared_id):
             return ServiceResult.fail(f"Die Fahrzeug-ID '{prepared_id}' existiert bereits.")
- 
+
         if prepared_customer_id and not self.customer_repository.exists(prepared_customer_id):
             return ServiceResult.fail(f"Der Kunde '{prepared_customer_id}' existiert nicht.")
- 
+
         sale_date = datetime.now().strftime("%d.%m.%Y") if prepared_status == "Verkauft" else ""
- 
+
         car = {
             "id": prepared_id,
             "brand": prepared_brand,
@@ -279,5 +318,5 @@ class CarService:
             "invoice_status": prepared_invoice_status,
             "status": prepared_status,
         }
- 
+
         return ServiceResult.ok("Validierung erfolgreich.", car=car)

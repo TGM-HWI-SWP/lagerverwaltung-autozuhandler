@@ -55,6 +55,19 @@ services:
     networks:
       - autozu_net
 
+  mongodb_autozu:
+    image: mongo:7
+    restart: unless-stopped
+    container_name: mongodb_autozu
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: autozuhaendler
+    volumes:
+      - "C:/Nextcloud_Autozu/mongodb:/data/db"
+    networks:
+      - autozu_net
+
 networks:
   autozu_net:
     external: true

@@ -1,19 +1,17 @@
-# Changelog - [Name]
+# Changelog - [Pavek]
 
-Persönliches Changelog für [Name], Rolle: [Rollenbezeichnung]
+Persönliches Changelog für [Pavek], Rolle: [GUI_&_Interaktion]
 
 ---
 
-## [v0.1] - 2025-01-20
+## [v0.1] - 2025-03-06
 
 ### Implementiert
-- [Feature/Fix 1]
-- [Feature/Fix 2]
-- [Feature/Fix 3]
+- [GUI Grundstruktur erstellt mit Gradio/Hauptfenster]
+- [Erstes Layout mit Buttons und Nextcloud Implementierung]
+- [Docker compose file geändert das es mit Ip funktioniert]
 
 ### Tests geschrieben
-- test_[name 1]
-- test_[name 2]
 
 ### Commits
 ```
