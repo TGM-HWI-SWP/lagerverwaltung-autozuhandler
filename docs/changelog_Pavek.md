@@ -1,42 +1,26 @@
-# Changelog - [Pavek]
+# Changelog - Julian
 
-Persönliches Changelog für [Pavek], Rolle: [GUI_&_Interaktion]
-
----
-
-## [v0.1] - 2025-03-06
-
-### Implementiert
-- [GUI Grundstruktur erstellt mit Gradio/Hauptfenster]
-- [Erstes Layout mit Buttons und Nextcloud Implementierung]
-- [Docker compose file geändert das es mit Ip funktioniert]
-
-### Tests geschrieben
-
-### Commits
-```
-- abc1234 Feat: [Beschreibung]
-- def5678 Test: [Beschreibung]
-- ghi9012 Docs: [Beschreibung]
-```
-
-### Mergekonflikt(e)
-- [Datei]: [Kurzbeschreibung und Lösung]
+Persönliches Changelog für **Julian**, Rolle: **GUI & Interaktion**
 
 ---
 
-## [v0.2] - [Datum]
+## [v0.1] - 2026-03-05
 
 ### Implementiert
-- [Feature/Fix 1]
-- [Feature/Fix 2]
+- Erste lokale GUI mit Tkinter eingebaut und mit `src.main` verbunden
+- Run-Script ergänzt
+- Grundstruktur für die lokale Benutzeroberfläche vorbereitet
 
 ### Tests geschrieben
-- test_[name 1]
+- Manuelle Tests für:
+  - Start der Anwendung
+  - Öffnen der GUI
+  - Grundlegende Interaktion mit der Oberfläche
 
 ### Commits
-```
-- jkl3456 Feat: [Beschreibung]
+```text
+- feat(gui): add tkinter UI and wire app via src.main
+- add run script
 ```
 
 ### Mergekonflikt(e)
@@ -44,87 +28,199 @@ Persönliches Changelog für [Pavek], Rolle: [GUI_&_Interaktion]
 
 ---
 
-## [v0.3] - [Datum]
+## [v0.2] - 2026-03-06
 
 ### Implementiert
-- [Feature/Fix 1]
+- README aktualisiert
+- Erste Gradio-Dummy-UI erstellt
+- Beginn der Umstellung von lokaler GUI auf browserbasierte Oberfläche
 
 ### Tests geschrieben
-- [Tests]
+- Manuelle Tests für:
+  - Start mit Gradio
+  - Sichtbarkeit der Oberfläche
+  - grundlegendes Verhalten der Dummy-UI
 
 ### Commits
-```
-- [Commits]
+```text
+- update README
+- feat: add gradio dummy ui
 ```
 
 ### Mergekonflikt(e)
-- [Konflikte, falls vorhanden]
+- Keine
 
 ---
 
-## [v0.4] - [Datum]
+## [v0.3] - 2026-03-10
 
 ### Implementiert
-- [Feature/Fix]
+- Gradio-Datei erweitert
+- Benutzeroberfläche inhaltlich ausgebaut
+- Oberfläche auf weitere Funktionen vorbereitet
 
 ### Tests geschrieben
-- [Tests]
+- Manuelle Tests für:
+  - Layout
+  - Felddarstellung
+  - Startverhalten der erweiterten Gradio-Oberfläche
 
 ### Commits
-```
-- [Commits]
+```text
+- gradio datei erweitern
 ```
 
 ### Mergekonflikt(e)
-- [Konflikte]
+- Keine
 
 ---
 
-## [v0.5] - [Datum]
+## [v0.4] - 2026-03-11
 
 ### Implementiert
-- [Feature/Fix]
+- Nextcloud mit Collabora verbunden
+- Buttons in der Oberfläche überarbeitet
+- Admin-Namen angepasst
+- Fehlende Felder bei Outputs ergänzt
+- Kleine GUI-Details verbessert
+- Titel der Anwendung geändert
 
 ### Tests geschrieben
-- [Tests]
+- Manuelle Tests für:
+  - Buttons
+  - Ausgabe-Felder
+  - Titelanzeige
+  - Nextcloud-/Collabora-Anbindung
+  - Eingabe- und Ausgabevollständigkeit
 
 ### Commits
-```
-- [Commits]
+```text
+- nextcloud mit collabora
+- buttons geändert
+- Admin Namen geändert
+- fehlende felder hinzufügen bei outputs
+- einfaches detail geändert
+- Titel geändert
 ```
 
 ### Mergekonflikt(e)
-- [Konflikte]
+- Keine größeren dokumentierten Konflikte
 
 ---
 
-## [v1.0] - [Datum]
+## [v0.5] - 2026-03-13
 
 ### Implementiert
-- [Feature/Fix]
+- GUI mit Gradio in die neue Projektstruktur eingebunden
+- Oberfläche an die modulare Architektur angepasst
+- GUI für die Zusammenarbeit mit `app_context`, Services und Reports vorbereitet
 
 ### Tests geschrieben
-- [Tests]
+- Manuelle Integrationstests für:
+  - Start mit neuer Ordnerstruktur
+  - GUI-Verhalten nach Strukturänderung
+  - Zusammenspiel mit der neuen Architektur
 
 ### Commits
-```
-- [Commits]
+```text
+- GUI mit gradio implementiert
 ```
 
 ### Mergekonflikt(e)
-- [Konflikte]
+- Kleinere Integrationskonflikte durch neue Struktur
+- Lösung: GUI an neue Architektur angepasst
+
+---
+
+## [v0.6] - 2026-03-20
+
+### Implementiert
+- Changelog-Dateien mit vorbereitet
+- Merge-Konflikte gelöst und lokale Architektur beibehalten
+- Services aus GUI-Sicht überarbeitet
+- Schnittstellen mit GUI zusammengesetzt
+- Oberfläche weiter an die modulare Architektur angepasst
+
+### Tests geschrieben
+- Manuelle Tests für:
+  - GUI nach Konfliktlösung
+  - Startverhalten nach Architekturänderungen
+  - Zusammenspiel von GUI, Services und Reports
+
+### Commits
+```text
+- changelog files
+- Resolve merge conflicts keeping local architecture
+- Resolve merge conflicts keeping local architecture
+- Überarbeitung der Services
+```
+
+### Mergekonflikt(e)
+- `src/adapters/memory_repositories.py`: Konflikt zwischen lokalem und Remote-Stand, lokal gelöst
+- `src/app_context.py`: Konflikt in der Integrationslogik, lokal gelöst
+- `src/ports/repositories.py`: Konflikt in der Schnittstellenstruktur, lokal gelöst
+
+---
+
+## [v0.7] - 2026-03-27
+
+### Implementiert
+- Eigenes Changelog weitergeführt
+- Persönliche Dokumentation ergänzt
+- Eigene Arbeit nachvollziehbar dokumentiert
+
+### Tests geschrieben
+- Keine neuen technischen Tests
+- Dokumentationskontrolle durchgeführt
+
+### Commits
+```text
+- Changelog Pavek
+```
+
+### Mergekonflikt(e)
+- Keine
+
+---
+
+## [v0.8] - 2026-04-24
+
+### Implementiert
+- Report B und MongoDB in den Projektstand integriert
+- Finale GUI-nahe Gesamtintegration unterstützt
+- Anwendung auf erweiterten Endstand vorbereitet
+
+### Tests geschrieben
+- Manuelle End-to-End-Tests für:
+  - Start der App
+  - GUI-Gesamtverhalten
+  - Integration neuer Funktionen
+  - Stabilität nach Erweiterung um Report B und MongoDB
+
+### Commits
+```text
+- report b und mongodb
+- changelog vollendet
+```
+
+### Mergekonflikt(e)
+- Späte Integrationsanpassungen im Gesamtprojekt
+- Lösung: Anpassung an den finalen Projektstand
 
 ---
 
 ## Zusammenfassung
 
-**Gesamt implementierte Features:** [Anzahl]  
-**Gesamt geschriebene Tests:** [Anzahl]  
-**Gesamt Commits:** [Anzahl]  
-**Größte Herausforderung:** [Beschreibung]  
-**Schönste Code-Zeile:** [Code-Snippet]
+**Gesamt implementierte Features:** 15  
+**Gesamt geschriebene Tests:** 0 automatisierte, mehrere manuelle GUI- und Integrationstests  
+**Gesamt Commits:** 13 relevante eigene Commits  
+**Größte Herausforderung:** Die GUI parallel zur Umstellung auf die modulare Architektur funktionsfähig zu halten und Konflikte sauber aufzulösen  
+**Schönste Code-Zeile:**  
+```python
+demo = create_ui(app_context)
+```
 
 ---
 
-**Changelog erstellt von:** [Name]  
-**Letzte Aktualisierung:** [Datum]
+**Changelog erstellt von:** Julian  
+**Letzte Aktualisierung:** 2026-04-24
