@@ -37,7 +37,7 @@ erstmal noch keine Tests geschrieben
 - [Erste einfache Berechnungen für Lagerbestand]
 
 ### Tests geschrieben
-- test_[name 1]
+- keine
 
 ### Commits
 ```
@@ -132,13 +132,16 @@ erstmal noch keine Tests geschrieben
 
 ## Zusammenfassung
 
-**Gesamt implementierte Features:** [Anzahl]  
-**Gesamt geschriebene Tests:** [Anzahl]  
-**Gesamt Commits:** [Anzahl]  
-**Größte Herausforderung:** [Beschreibung]  
-**Schönste Code-Zeile:** [Code-Snippet]
+**Gesamt implementierte Features:** [12]  
+**Gesamt geschriebene Tests:** [4]  
+**Gesamt Commits:** [12]  
+**Größte Herausforderung:** [Umsetzung der Businesslogik und Berechnung der Daten für Report A usw.]  
+**Schönste Code-Zeile:** [  assert result.success is True
+                            assert result.data["car"]["brand"] == "BMW"
+                            assert result.data["car"]["model"] == "X5"
+                            assert len(service.get_all()) == 1  ] <!-- Weil einer meiner Lieblingsautos -->
 
 ---
 
-**Changelog erstellt von:** [Name]  
-**Letzte Aktualisierung:** [Datum]
+**Changelog erstellt von:** [Simsek Mikail]  
+**Letzte Aktualisierung:** [24.04.2026]
