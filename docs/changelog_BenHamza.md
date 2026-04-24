@@ -4,75 +4,74 @@ Persönliches Changelog für [Ben Hamza], Rolle: [Rolle 1 Contract Owner]
 
 ---
 
-## [v0.1] - 2025-01-20
+## [v0.1] - 2026-03-13
 
 ### Implementiert
-- [Projektstart und Rollenverteilung]
-- [Projektstruktur im Repository überprüft und organisiert]
-- [Erste Schnittstellen (Contracts) definiert]
+- [Schnittstellen (Contracts) für Produktverwaltung vorgegeben]
+- [Schnittstellen und Ordnerstruktur erweitert und korrigiert]
+- [benötigte Dateien erstellt, Architektur im Team festgelegt]
 
 ### Tests geschrieben
-- test_[name 1]
-- test_[name 2]
+- keine
 
-noch keine
 
 ### Commits
 ```
-- abc1234 Feat: [Ordnerstruktur und Schnittstellenvorgabe]
-- def5678 Test: [Bearbeitung der Ordnerstruktur und Schnittstellenvorgabe]
-- ghi9012 Docs: [app_context]
+- db7a2d6e56e50342d91e3f41169c43e91b2a71be Feat: [Ordnerstruktur und Schnittstellenvorgabe]
+- 052a1ffd64b309ab2dcc888a6c1fee88075237f1 Test: [Bearbeitung der Ordnerstruktur und Schnittstellenvorgabe]
+- c497ce76d2cd0625327109e39411adf00fe0c4c6 Docs: [app_context.py hinzugefügt]
 ```
 
 ### Mergekonflikt(e)
-- [Datei]: [Kurzbeschreibung und Lösung]
+- keine (nur dateien gelöscht)
 
 ---
 
-## [v0.2] - [Datum]
+## [v0.2] - [2026-03-13]
 
 ### Implementiert
-- [Feature/Fix 1]
-- [Feature/Fix 2]
+- [Repositories hinzugefügt und bearbeitet]
+- [app_context.py bearbeitet und services sowie reports importiert]
 
 ### Tests geschrieben
-- test_[name 1]
+- keine
 
 ### Commits
 ```
-- jkl3456 Feat: [Beschreibung]
+- 550908552f7f6fd50f460c9e52319ba5e05367c5 Feat: [repositories]
+- 70a2b08feaaead932e6efd1141df23ce083a04b4 Feat: [app_context]
 ```
 
 ### Mergekonflikt(e)
-- Keine
+- Konflikt durch parallele Änderungen -> zusammengeführt und abgestimmt
 
 ---
 
-## [v0.3] - [Datum]
+## [v0.3] - [2026-03-27]
 
 ### Implementiert
-- [Feature/Fix 1]
+- [changelog angefangen]
 
 ### Tests geschrieben
-- [Tests]
+- keine
 
 ### Commits
 ```
-- [Commits]
+- 562048c538e980de668a49410292ae517e4dcbef Feat:[Changelog Ben Hamza]
 ```
 
 ### Mergekonflikt(e)
-- [Konflikte, falls vorhanden]
+- keine
 
 ---
 
-## [v0.4] - [Datum]
+## [v0.4] - [2026-04-24]
 
 ### Implementiert
-- [Feature/Fix]
+- [Changelog fertiggestellt]
 
 ### Tests geschrieben
-- [Tests]
+- keine
 
 ### Commits
 ```
